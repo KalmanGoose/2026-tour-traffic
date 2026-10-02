@@ -100,6 +100,9 @@
             <span class="text-[11px] bg-amber-100 text-amber-900 border border-amber-300 font-black px-2 py-1 rounded-lg flex items-center shadow-xs">
               🛡️ 管理員
             </span>
+            <button onclick="openManagePointsModal()" class="text-[11px] bg-blue-100 hover:bg-blue-200 text-[#004B97] border border-blue-300 font-bold px-2 py-1 rounded-lg flex items-center transition" title="修改P1-P10註解">
+              📍 編輯P1~P10註解
+            </button>
             <button onclick="openSettingsModal()" class="p-1.5 text-slate-500 hover:text-[#004B97] bg-slate-100 rounded-lg transition" title="系統設定">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
             </button>
@@ -587,22 +590,51 @@
       <div class="space-y-2">
         <p class="text-[#5b7290]">為 <strong id="editTargetName" class="text-[#004B97]"></strong> 重新指定點位：</p>
         <select id="editNewPoint" class="w-full bg-[#F0F8FF] border border-blue-200 text-[#0F2745] rounded-xl p-2 font-bold focus:ring-2 focus:ring-[#004B97]">
-          <option value="P01 (港源起點)">P01 (港源起點)</option>
-          <option value="P02">P02 (前段叉路)</option>
-          <option value="P03">P03 (中段上坡)</option>
-          <option value="P04">P04 (狹窄會車處)</option>
-          <option value="P05 (越嶺高點)">P05 (越嶺高點)</option>
-          <option value="P06">P06 (下坡急彎1)</option>
-          <option value="P07">P07 (下坡急彎2)</option>
-          <option value="P08">P08 (新興聚落路口)</option>
-          <option value="P09 (水里興民宮/131線)">P09 (水里興民宮/131線)</option>
-          <option value="P10">P10 (沿線路口)</option>
+          <!-- 動態由 JS 渲染 -->
         </select>
+        <div class="pt-1">
+          <button type="button" onclick="closeEditPointModal(); openManagePointsModal();" class="text-[11px] text-[#004B97] hover:underline font-bold flex items-center">
+            📍 想修改 P1~P10 的名稱或註解？點此編輯 ↗
+          </button>
+        </div>
       </div>
 
       <div class="pt-2 flex justify-end space-x-2">
         <button onclick="confirmPointEdit()" class="btn-gradient font-bold px-4 py-2 rounded-lg">儲存變更</button>
         <button onclick="closeEditPointModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 📍 管理員自訂 P1~P10 名稱與註解 Modal ================= -->
+  <div id="managePointsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl text-xs overflow-hidden" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between p-4 border-b border-blue-100 bg-[#F0F8FF]">
+        <div>
+          <h3 class="font-black text-sm text-[#004B97] flex items-center">
+            📍 編輯 P1 ~ P10 站點名稱與註解說明
+          </h3>
+          <p class="text-[11px] text-[#5b7290]">修改後，所有打卡選單與站點註解將同步更新</p>
+        </div>
+        <button onclick="closeManagePointsModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+      </div>
+
+      <div class="p-4 overflow-y-auto space-y-3.5" id="pointsEditorList">
+        <!-- 動態產生 10 個點位的編輯表單 -->
+      </div>
+
+      <div class="p-3 border-t border-blue-100 bg-slate-50 flex items-center justify-between">
+        <button type="button" onclick="resetPointsConfig()" class="text-[11px] text-slate-500 hover:text-rose-600 underline font-bold">
+          重設為大會預設說明
+        </button>
+        <div class="flex space-x-2">
+          <button type="button" onclick="saveManagePointsForm()" class="btn-gradient font-bold px-4 py-2 rounded-xl text-xs shadow-sm active:scale-95 transition">
+            💾 儲存所有站點設定
+          </button>
+          <button type="button" onclick="closeManagePointsModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-2 rounded-xl text-xs">
+            取消
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -654,6 +686,131 @@
     // 帳密驗證 SHA-256 Hash
     const AUTH_HASH = "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
 
+    // 預設 P1 ~ P10 站點名稱與詳細管制註解
+    const DEFAULT_POINTS_CONFIG = [
+      { id: "P01", label: "港源起點", note: "國姓鄉港源國小校門口，管制港頭巷農車橫越，引導選手靠右進入縣道147主線" },
+      { id: "P02", label: "前段叉路/一號橋", note: "港源一號橋前農路岔路口，阻擋右側便道農用車輛匯入" },
+      { id: "P03", label: "中段上坡彎道", note: "縣道147約6K處農路口，連續上坡盲彎，揮旗警示對向來車減速靠邊" },
+      { id: "P04", label: "二號橋狹窄處", note: "二號橋橋頭，路幅明顯縮減，吹哨示警引導單車依序靠右通過" },
+      { id: "P05", label: "越嶺高點/分水嶺", note: "國姓水里交界最高點界碑，極重要：即將進入長陡下坡，提醒減速握下把" },
+      { id: "P06", label: "下坡急彎 1", note: "水里端連續下坡第1個大髮夾盲彎，揮旗示警，防範對向車輛越線" },
+      { id: "P07", label: "下坡急彎 2", note: "新興村上段陡坡盲彎，引導靠右下坡，注意路側碎石" },
+      { id: "P08", label: "新興聚落十字路", note: "新興國小旁社區聚落十字路口，阻隔聚落機車行人橫越" },
+      { id: "P09", label: "水里興民宮/131線", note: "縣道147終點接131線興民宮前，極重要：匯入主幹道前全向交管阻隔主線外車" },
+      { id: "P10", label: "水里備援路口", note: "水里端沿線機動備援點位" }
+    ];
+
+    function getPointsConfig() {
+      const saved = localStorage.getItem("points_config");
+      if (saved) {
+        try { return JSON.parse(saved); } catch(e) {}
+      }
+      return DEFAULT_POINTS_CONFIG;
+    }
+
+    function savePointsConfig(config) {
+      localStorage.setItem("points_config", JSON.stringify(config));
+      renderPointDropdowns();
+    }
+
+    function renderPointDropdowns() {
+      const config = getPointsConfig();
+      const select1 = document.getElementById("assignedPoint");
+      const select2 = document.getElementById("editNewPoint");
+
+      if (select1) {
+        const curVal = select1.value;
+        select1.innerHTML = "";
+        config.forEach(pt => {
+          const opt = document.createElement("option");
+          opt.value = `${pt.id} (${pt.label})`;
+          opt.textContent = `${pt.id} (${pt.label})`;
+          select1.appendChild(opt);
+        });
+        if (curVal) select1.value = curVal;
+      }
+
+      if (select2) {
+        const curVal2 = select2.value;
+        select2.innerHTML = "";
+        config.forEach(pt => {
+          const opt = document.createElement("option");
+          opt.value = `${pt.id} (${pt.label})`;
+          opt.textContent = `${pt.id} (${pt.label})`;
+          select2.appendChild(opt);
+        });
+        if (curVal2) select2.value = curVal2;
+      }
+    }
+
+    function openManagePointsModal(targetPtId) {
+      const config = getPointsConfig();
+      const container = document.getElementById("pointsEditorList");
+      container.innerHTML = "";
+
+      config.forEach((pt, index) => {
+        const row = document.createElement("div");
+        row.id = `edit-row-${pt.id}`;
+        row.className = `p-3 rounded-xl border bg-white space-y-2 ${
+          targetPtId === pt.id ? 'border-amber-400 bg-amber-50/40 ring-2 ring-amber-300' : 'border-blue-100'
+        }`;
+
+        row.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="bg-[#004B97] text-white font-black px-2 py-0.5 rounded text-xs">
+              ${pt.id}
+            </span>
+            <span class="text-[11px] text-[#5b7290]">第 ${index + 1} 號點位</span>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-[#0F2745] mb-0.5">站點標籤/路口簡稱</label>
+            <input type="text" id="pt-label-${index}" value="${pt.label || ''}" placeholder="如：港源起點校門口" class="w-full bg-[#F0F8FF] border border-blue-200 rounded-lg p-2 font-bold text-[#004B97] text-xs focus:ring-2 focus:ring-[#004B97]">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-[#0F2745] mb-0.5">現場管制註解與注意事項</label>
+            <textarea id="pt-note-${index}" rows="2" placeholder="填寫該路口管制重點、提醒事項..." class="w-full bg-[#F0F8FF] border border-blue-200 rounded-lg p-2 text-slate-800 text-xs focus:ring-2 focus:ring-[#004B97]">${pt.note || ''}</textarea>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+
+      document.getElementById("managePointsModal").classList.remove("hidden");
+
+      if (targetPtId) {
+        setTimeout(() => {
+          const el = document.getElementById(`edit-row-${targetPtId}`);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
+    }
+
+    function closeManagePointsModal() {
+      document.getElementById("managePointsModal").classList.add("hidden");
+    }
+
+    function saveManagePointsForm() {
+      const config = getPointsConfig();
+      config.forEach((pt, index) => {
+        const lbl = document.getElementById(`pt-label-${index}`);
+        const nte = document.getElementById(`pt-note-${index}`);
+        if (lbl) pt.label = lbl.value.trim() || pt.label;
+        if (nte) pt.note = nte.value.trim();
+      });
+
+      savePointsConfig(config);
+      closeManagePointsModal();
+      alert("✅ P1 ~ P10 站點名稱與註解已成功儲存！所有選單已同步更新。");
+    }
+
+    function resetPointsConfig() {
+      if (!confirm("確定要重設為大會預設的點位名稱與說明嗎？")) return;
+      savePointsConfig(DEFAULT_POINTS_CONFIG);
+      openManagePointsModal();
+      alert("已重設為預設說明！");
+    }
+
     let currentLat = null;
     let currentLng = null;
     let currentAccuracy = null;
@@ -663,6 +820,7 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       checkAdminStatus();
+      renderPointDropdowns();
       renderRoster();
       fetchOnlineRecords();
       // 每 15 秒自動輪詢雲端試算表一次，即時看見別人拍照
@@ -823,6 +981,9 @@
           displayTime = `${(d.getHours()+8)%24 < 10 ? '0' : ''}${(d.getHours()+8)%24}:${d.getMinutes() < 10 ? '0' : ''}${d.getMinutes()}`;
         }
 
+        const ptId = (userRecord.pointId || '').split(' ')[0];
+        const ptConf = getPointsConfig().find(p => p.id === ptId);
+
         content.innerHTML = `
           <div class="bg-[#F0F8FF] p-3 rounded-xl border border-blue-200/80 space-y-1.5">
             <div class="flex items-center justify-between">
@@ -839,7 +1000,12 @@
             </div>
             ${userRecord.note ? `
               <div class="pt-1 border-t border-blue-200/60 text-[#0F2745]">
-                💬 <strong>備註：</strong> ${userRecord.note}
+                💬 <strong>志工回報備註：</strong> ${userRecord.note}
+              </div>
+            ` : ''}
+            ${ptConf && ptConf.note ? `
+              <div class="pt-1.5 border-t border-blue-200/60 text-[#0F2745] bg-amber-50/70 p-2 rounded-lg border border-amber-200/80">
+                📌 <strong>${ptConf.id} 站點管制註解：</strong> ${ptConf.note}
               </div>
             ` : ''}
           </div>
@@ -854,7 +1020,7 @@
               <img src="${directImgUrl}" 
                    onclick="openLightbox('${directImgUrl}', '${name} - ${userRecord.pointId}')"
                    class="w-full max-h-56 object-cover rounded-xl border border-blue-200 shadow-sm cursor-pointer hover:opacity-95 transition" 
-                   alt="現場照片"
+                   alt="現場照片" 
                    onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=${userRecord.photoUrl.match(/(?:\/d\/|id=)([a-zA-Z0-9_-]{25,})/)?.[1]}&sz=w800'">
             </div>
           ` : `
@@ -864,7 +1030,7 @@
           `}
 
           <!-- 操作按鈕 -->
-          <div class="pt-1 flex items-center space-x-2">
+          <div class="pt-1 flex flex-wrap items-center gap-1.5">
             ${mapHref ? `
               <a href="${mapHref}" target="_blank" class="flex-1 btn-gradient font-bold py-2 rounded-xl text-center flex items-center justify-center active:scale-95 transition">
                 🗺️ 在 Google Maps 查看位置
@@ -873,6 +1039,9 @@
             ${isAdmin ? `
               <button onclick="openEditPointModal('${name}', '${userRecord.pointId || ''}')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-bold px-3 py-2 rounded-xl transition">
                 ✏️ 調整點位
+              </button>
+              <button onclick="closeVolunteerDetailModal(); openManagePointsModal('${ptId}');" class="bg-blue-100 hover:bg-blue-200 text-[#004B97] border border-blue-300 font-bold px-3 py-2 rounded-xl transition">
+                📍 編輯此點註解
               </button>
             ` : ''}
           </div>
