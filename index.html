@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>2026 環法挑戰賽 日月潭站 - 147線交管定位回報系統</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -11,11 +14,15 @@
       theme: {
         extend: {
           colors: {
-            tour: {
-              yellow: '#FACC15',
-              dark: '#0F172A',
-              card: '#1E293B',
-              border: '#334155'
+            brand: {
+              primary: '#004B97',
+              dark: '#003a75',
+              mint: '#ABDAD5',
+              mintLight: 'rgba(171, 218, 213, 0.35)',
+              bg: '#F0F8FF',
+              text: '#0F2745',
+              muted: '#5b7290',
+              rose: '#e11d48'
             }
           }
         }
@@ -23,37 +30,67 @@
     }
   </script>
   <style>
-    * { -webkit-tap-highlight-color: transparent; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    .pulse-glow {
-      animation: pulseGlow 2s infinite;
+    :root {
+      --primary: #004B97;
+      --primary-dark: #003a75;
+      --mint: #ABDAD5;
+      --mint-light: rgba(171, 218, 213, 0.35);
+      --text-main: #0F2745;
+      --text-muted: #5b7290;
+      --bg: #F0F8FF;
+      --card-radius: 16px;
+      --shadow-sm: 0 2px 8px rgba(15, 39, 69, .06);
+      --shadow-md: 0 8px 24px rgba(15, 39, 69, .09);
     }
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 15px rgba(250, 204, 21, 0.4); border-color: #FACC15; }
-      50% { box-shadow: 0 0 5px rgba(250, 204, 21, 0.1); border-color: #CA8A04; }
+    * { -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+    }
+    .card-base {
+      background: #ffffff;
+      border: 1px solid rgba(0, 75, 151, 0.1);
+      border-radius: var(--card-radius);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-gradient {
+      background: linear-gradient(135deg, #004B97, #1e6bb8);
+      color: #ffffff;
+    }
+    .btn-gradient:hover {
+      background: linear-gradient(135deg, #003a75, #165696);
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-24 selection:bg-yellow-400 selection:text-slate-900">
+<body class="min-h-screen pb-24">
 
-  <!-- ================= 頂部導航欄 ================= -->
-  <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40">
+  <!-- ================= 頂部導覽列 (匹克球招募同款風格) ================= -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-blue-900/10 shadow-sm">
     <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center space-x-2">
-        <span class="inline-block w-2.5 h-2.5 rounded-full bg-yellow-400 animate-ping"></span>
+      <div class="flex items-center space-x-2.5">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#004B97] to-[#ABDAD5] flex items-center justify-center text-white font-black text-sm shadow-sm">
+          🚴
+        </div>
         <div>
-          <h1 class="font-black text-sm sm:text-base tracking-wider text-yellow-400">
+          <h1 class="font-black text-sm sm:text-base text-[#004B97] tracking-tight leading-tight">
             2026 環法挑戰賽 日月潭站
           </h1>
-          <p class="text-[10px] text-slate-400">147 縣道機車交管 · 即時放人打卡系統</p>
+          <p class="text-[11px] text-[#5b7290] font-medium">147 縣道交管現場打卡系統</p>
         </div>
       </div>
+
       <div class="flex items-center space-x-2">
-        <button onclick="refreshData()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg flex items-center transition">
-          <svg id="refreshIcon" class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-          重新整理
+        <div id="syncBadge" class="hidden sm:flex items-center text-[11px] bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full font-bold border border-emerald-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
+          即時連線中
+        </div>
+        <button onclick="refreshData()" class="text-xs bg-[#F0F8FF] hover:bg-blue-50 text-[#004B97] border border-blue-200 font-bold px-2.5 py-1.5 rounded-lg flex items-center transition active:scale-95">
+          <svg id="refreshIcon" class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          重新整現
         </button>
-        <button onclick="openSettingsModal()" class="p-1.5 text-slate-400 hover:text-slate-200 rounded-lg hover:bg-slate-800 transition" title="後端設定">
+        <button onclick="openSettingsModal()" class="p-1.5 text-slate-400 hover:text-[#004B97] rounded-lg transition" title="後端設定">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
         </button>
       </div>
@@ -63,124 +100,98 @@
   <main class="max-w-2xl mx-auto px-4 py-4 space-y-4">
 
     <!-- ================= 🚨 緊急聯絡人：波哥 一鍵撥打卡片 ================= -->
-    <section class="bg-gradient-to-r from-red-950 via-slate-900 to-red-950 border-2 border-red-500/80 rounded-2xl p-3.5 shadow-lg">
+    <section class="card-base p-4 border-rose-200 bg-gradient-to-r from-rose-50/70 to-white">
       <div class="flex items-center justify-between mb-2">
         <div class="flex items-center space-x-1.5">
           <span class="flex h-2.5 w-2.5 relative">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
           </span>
-          <span class="text-xs font-black text-red-400">大會緊急通報專線</span>
+          <span class="text-xs font-black text-rose-600 tracking-wider">大會緊急通報專線</span>
         </div>
-        <span class="text-[10px] text-red-300">遇突發事故請立即撥打</span>
+        <span class="text-[11px] text-rose-500">遇突發狀況請立即聯繫</span>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
         <!-- 波哥 -->
-        <a href="tel:0970318010" class="col-span-1 sm:col-span-2 bg-red-600 hover:bg-red-500 text-white font-black p-3 rounded-xl flex items-center justify-between shadow-lg active:scale-98 transition">
+        <a href="tel:0970318010" class="col-span-1 sm:col-span-2 bg-[#e11d48] hover:bg-rose-700 text-white font-bold p-3 rounded-xl flex items-center justify-between shadow-sm active:scale-98 transition">
           <div class="flex items-center space-x-2.5">
-            <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-lg">
+            <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-base">
               📞
             </div>
             <div>
-              <div class="text-xs text-red-100">緊急聯絡人</div>
-              <div class="text-base font-black tracking-wider">波哥 0970-318-010</div>
+              <div class="text-[11px] text-rose-100">緊急聯絡人</div>
+              <div class="text-sm font-black tracking-wide">波哥 0970-318-010</div>
             </div>
           </div>
-          <span class="bg-white text-red-600 text-xs px-2.5 py-1 rounded-lg font-black shadow">立即撥打</span>
+          <span class="bg-white text-rose-600 text-xs px-2.5 py-1 rounded-lg font-black shadow-sm">一鍵撥打</span>
         </a>
 
         <!-- 警消 -->
         <div class="grid grid-cols-2 gap-2">
-          <a href="tel:119" class="bg-slate-800 hover:bg-slate-700 border border-red-500/40 text-red-200 p-2 rounded-xl text-center flex flex-col items-center justify-center active:scale-95 transition">
-            <span class="text-[10px] text-red-400">醫療救護</span>
+          <a href="tel:119" class="bg-white hover:bg-rose-50/50 border border-rose-200 text-rose-700 p-2 rounded-xl text-center flex flex-col items-center justify-center active:scale-95 transition">
+            <span class="text-[10px] text-rose-500 font-semibold">醫療救護</span>
             <span class="font-bold text-xs mt-0.5">🚑 119</span>
           </a>
-          <a href="tel:110" class="bg-slate-800 hover:bg-slate-700 border border-red-500/40 text-red-200 p-2 rounded-xl text-center flex flex-col items-center justify-center active:scale-95 transition">
-            <span class="text-[10px] text-red-400">警方協助</span>
+          <a href="tel:110" class="bg-white hover:bg-rose-50/50 border border-rose-200 text-rose-700 p-2 rounded-xl text-center flex flex-col items-center justify-center active:scale-95 transition">
+            <span class="text-[10px] text-rose-500 font-semibold">警方協助</span>
             <span class="font-bold text-xs mt-0.5">👮 110</span>
           </a>
         </div>
       </div>
     </section>
 
-    <!-- ================= 賽事重要時程與集合資訊 ================= -->
-    <section class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 text-xs space-y-2">
-      <div class="flex items-center justify-between text-yellow-400 font-bold border-b border-slate-800 pb-1.5">
-        <span class="flex items-center">
-          <svg class="w-4 h-4 mr-1 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          賽事勤務須知 (115/10/03)
+    <!-- ================= 賽事時程與地圖導航 ================= -->
+    <section class="card-base p-4 text-xs space-y-2.5">
+      <div class="flex items-center justify-between border-b border-blue-100 pb-2">
+        <span class="font-black text-[#004B97] flex items-center text-sm">
+          <svg class="w-4 h-4 mr-1 text-[#004B97]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          賽事勤務與路線指引
         </span>
-        <span class="text-[10px] bg-yellow-400/20 text-yellow-300 px-2 py-0.5 rounded">04:00 - 08:00 (12:00)</span>
+        <span class="text-[11px] bg-blue-100 text-[#004B97] font-bold px-2 py-0.5 rounded-full">10/03 清晨 04:00 集合</span>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-300">
-        <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/50">
-          <p class="font-semibold text-slate-200">🚩 <strong>集合時間地點：</strong></p>
-          <p class="mt-0.5 text-yellow-300 font-bold">10/03 清晨 04:00 埔里瀛海城隍廟</p>
-          <p class="text-[11px] text-slate-400 mt-1">準時集合完畢後出發前往 147 縣道</p>
-        </div>
-        <div class="bg-slate-800/60 p-2.5 rounded-lg border border-slate-700/50">
-          <p class="font-semibold text-slate-200">🛵 <strong>本次專屬任務：</strong></p>
-          <p class="mt-0.5 text-yellow-300 font-bold">10 位自行騎機車至 147 線站崗</p>
-          <p class="text-[11px] text-slate-400 mt-1">範圍：港源國小 ➔ 147 / 131 路口（興民宮）</p>
-        </div>
-      </div>
-
-      <div class="text-[11px] text-slate-400 bg-slate-950/50 p-2 rounded-lg border border-slate-800/60">
-        💡 <strong>撤哨提醒：</strong> 賽事結束後，主辦單位會有專車自水里/147線回收工作人員回埔里。
-      </div>
-    </section>
-
-    <!-- ================= 路線地圖連結 ================= -->
-    <section class="bg-slate-900 border border-slate-800 rounded-xl p-3.5">
-      <div class="flex items-center justify-between mb-2">
-        <h3 class="text-xs font-bold text-yellow-400 flex items-center">
-          <svg class="w-4 h-4 mr-1 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
-          Google Maps 路線導航（點擊開啟 App）
-        </h3>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-        <a href="https://maps.app.goo.gl/3WyY65MER5ZxGkHf6" target="_blank" class="block bg-slate-800/90 hover:bg-slate-800 border border-slate-700 p-2.5 rounded-lg active:scale-98 transition">
-          <div class="flex items-center justify-between text-yellow-300 font-bold mb-0.5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <a href="https://maps.app.goo.gl/3WyY65MER5ZxGkHf6" target="_blank" class="block p-3 rounded-xl bg-[#F0F8FF] hover:bg-blue-100/60 border border-blue-200/60 transition active:scale-98">
+          <div class="flex items-center justify-between text-[#004B97] font-bold mb-1">
             <span>① 集合 ➔ 前往放人起點</span>
-            <span class="text-[10px] bg-yellow-400/20 text-yellow-300 px-1 rounded">開啟路線 ↗</span>
+            <span class="text-[10px] bg-[#004B97] text-white px-1.5 py-0.2 rounded-full font-bold">路線圖 ↗</span>
           </div>
-          <p class="text-slate-300">🚩 <strong>出發：</strong> 埔里瀛海城隍廟</p>
-          <p class="text-slate-300">📍 <strong>抵達：</strong> 國姓鄉港源國小（147線起點）</p>
+          <p class="text-[#0F2745]">🚩 <strong>集合：</strong> 埔里瀛海城隍廟</p>
+          <p class="text-[#5b7290] mt-0.5">抵達：國姓鄉港源國小（147線起點）</p>
         </a>
 
-        <a href="https://maps.app.goo.gl/hHcujPW74qMyqZr18" target="_blank" class="block bg-amber-950/30 hover:bg-amber-950/50 border border-yellow-500/40 p-2.5 rounded-lg active:scale-98 transition">
-          <div class="flex items-center justify-between text-yellow-400 font-bold mb-0.5">
-            <span>② 147縣道放人路段（放10人）</span>
-            <span class="text-[10px] bg-yellow-400 text-slate-950 font-black px-1 rounded">主要路段 ↗</span>
+        <a href="https://maps.app.goo.gl/hHcujPW74qMyqZr18" target="_blank" class="block p-3 rounded-xl bg-emerald-50/70 hover:bg-emerald-100/60 border border-emerald-200/60 transition active:scale-98">
+          <div class="flex items-center justify-between text-emerald-800 font-bold mb-1">
+            <span>② 147 縣道放人路段</span>
+            <span class="text-[10px] bg-emerald-600 text-white px-1.5 py-0.2 rounded-full font-bold">部署路線 ↗</span>
           </div>
-          <p class="text-slate-200">🏁 <strong>起點：</strong> 港源國小</p>
-          <p class="text-slate-200">🏁 <strong>終點：</strong> 水里新興村興民宮（約 8.5 km）</p>
+          <p class="text-[#0F2745]">🏁 <strong>範圍：</strong> 港源國小 ➔ 水里興民宮</p>
+          <p class="text-emerald-700 mt-0.5">沿線約 8.5 km，各路口放置 10 員</p>
         </a>
       </div>
     </section>
 
     <!-- ================= 核心操作：現場放人打卡 ＆ GPS 座標回報 ================= -->
-    <section class="bg-slate-900 border-2 border-yellow-400/80 rounded-2xl p-4 shadow-xl pulse-glow">
-      <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
-        <h2 class="font-black text-sm sm:text-base text-yellow-400 flex items-center">
-          <svg class="w-5 h-5 mr-1.5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-          📍 現場就位打卡 ＆ 回傳 GPS 座標
+    <section class="card-base p-4 border-2 border-blue-200/80 shadow-md">
+      <div class="flex items-center justify-between mb-3 border-b border-blue-100 pb-2">
+        <h2 class="font-black text-sm sm:text-base text-[#004B97] flex items-center">
+          <svg class="w-5 h-5 mr-1.5 text-[#004B97]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          現場就位打卡 ＆ 回傳 GPS 座標
         </h2>
-        <span class="text-[11px] bg-yellow-400 text-slate-950 px-2 py-0.5 rounded font-black">放人打卡處</span>
+        <span class="text-[11px] bg-[#ABDAD5] text-[#004B97] font-black px-2 py-0.5 rounded-full">放人即時打卡</span>
       </div>
 
-      <p class="text-xs text-slate-300 mb-3 leading-relaxed">
-        明天隨車/隨隊被放到路口後，請在此選您的<strong>姓名</strong>與<strong>路口編號</strong>，按<strong>「抓取 GPS」</strong>並<strong>拍照</strong>送出，波哥與指揮中心即可在後台即時掌握大家的位置！
+      <p class="text-xs text-[#5b7290] mb-3 leading-relaxed">
+        隨車隊被放到路口後，請在此選您的<strong>姓名</strong>與<strong>路口點號</strong>，按<strong>「抓取 GPS」</strong>並<strong>拍照</strong>送出，後端將自動統計經緯度與照片！
       </p>
 
       <form id="checkInForm" onsubmit="handleCheckInSubmit(event)" class="space-y-3 text-xs">
-        <!-- 姓名與點位選取 -->
+        <!-- 姓名與點位選取 (已砍掉機動選項) -->
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-slate-400 font-semibold mb-1">① 您的姓名 *</label>
-            <select id="volunteerName" required onchange="onNameChange(this.value)" class="w-full bg-slate-800 border border-slate-700 text-yellow-300 rounded-xl p-2.5 font-bold focus:ring-2 focus:ring-yellow-400 focus:outline-none">
+            <label class="block text-[#0F2745] font-bold mb-1">① 您的姓名 *</label>
+            <select id="volunteerName" required class="w-full bg-[#F0F8FF] border border-blue-200 text-[#004B97] rounded-xl p-2.5 font-bold focus:ring-2 focus:ring-[#004B97] focus:outline-none">
               <option value="">-- 請選擇您的名字 --</option>
               <option value="楊皓柄">楊皓柄</option>
               <option value="陳皇秀">陳皇秀</option>
@@ -189,79 +200,78 @@
               <option value="張玉岑">張玉岑</option>
               <option value="葉子毅">葉子毅</option>
               <option value="李大衛">李大衛</option>
-              <option value="溫碧玉">溫碧玉（147機巡）</option>
-              <option value="劉雯伶">劉雯伶（147機巡）</option>
+              <option value="溫碧玉">溫碧玉</option>
+              <option value="劉雯伶">劉雯伶</option>
               <option value="卜湘芸">卜湘芸</option>
               <option value="李宥霆">李宥霆</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-slate-400 font-semibold mb-1">② 被分配點號 *</label>
-            <select id="assignedPoint" required class="w-full bg-slate-800 border border-slate-700 text-slate-100 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-yellow-400 focus:outline-none">
-              <option value="P01 (港源國小起點)">P01 (港源國小起點)</option>
-              <option value="P02 (前段叉路/橋頭)">P02 (前段叉路/橋頭)</option>
-              <option value="P03 (南港村中段彎道)">P03 (南港村中段彎道)</option>
-              <option value="P04 (二號橋狹窄段)">P04 (二號橋狹窄段)</option>
-              <option value="P05 (越嶺最高分水嶺)">P05 (越嶺最高分水嶺/陡下坡前)</option>
-              <option value="P06 (水里下坡急彎1)">P06 (水里下坡急彎1)</option>
-              <option value="P07 (水里下坡急彎2)">P07 (水里下坡急彎2)</option>
-              <option value="P08 (新興村車坪崙叉路)">P08 (新興村車坪崙叉路)</option>
-              <option value="P09 (147/131路口 興民宮)">P09 (147/131路口 興民宮)</option>
-              <option value="P10 (機動/其他)">P10 (機動備援點)</option>
-              <option value="M01 (147線全程機巡組)">M01 (147線全程機巡組)</option>
+            <label class="block text-[#0F2745] font-bold mb-1">② 被分配點號 *</label>
+            <select id="assignedPoint" required class="w-full bg-[#F0F8FF] border border-blue-200 text-[#0F2745] rounded-xl p-2.5 font-semibold focus:ring-2 focus:ring-[#004B97] focus:outline-none">
+              <option value="P01 (港源起點)">P01 (港源起點)</option>
+              <option value="P02">P02 (前段叉路)</option>
+              <option value="P03">P03 (中段上坡)</option>
+              <option value="P04">P04 (狹窄會車處)</option>
+              <option value="P05 (越嶺高點)">P05 (越嶺高點)</option>
+              <option value="P06">P06 (下坡急彎1)</option>
+              <option value="P07">P07 (下坡急彎2)</option>
+              <option value="P08">P08 (新興聚落路口)</option>
+              <option value="P09 (水里興民宮/131線)">P09 (水里興民宮/131線)</option>
+              <option value="P10">P10 (沿線路口)</option>
             </select>
           </div>
         </div>
 
         <!-- GPS 座標擷取區塊 -->
-        <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-3">
+        <div class="bg-[#F0F8FF] border border-blue-200/80 rounded-xl p-3">
           <div class="flex items-center justify-between mb-2">
-            <span class="font-bold text-slate-300 flex items-center">
+            <span class="font-bold text-[#0F2745] flex items-center">
               ③ 目前精確 GPS 座標 *
             </span>
-            <button type="button" onclick="getLocation()" id="gpsBtn" class="bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black px-3 py-1.5 rounded-lg text-xs shadow flex items-center active:scale-95 transition">
-              <svg id="gpsIcon" class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <button type="button" onclick="getLocation()" id="gpsBtn" class="bg-[#004B97] hover:bg-[#003a75] text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow-sm flex items-center active:scale-95 transition">
+              <svg id="gpsIcon" class="w-3.5 h-3.5 mr-1 text-[#ABDAD5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               📍 點我抓取目前 GPS
             </button>
           </div>
 
-          <div id="gpsStatusContainer" class="text-slate-400 text-xs">
+          <div id="gpsStatusContainer" class="text-[#5b7290] text-xs">
             <span id="gpsStatusText">尚未取得座標，請點擊上方按鈕授權定位。</span>
-            <div id="gpsCoordsDisplay" class="hidden mt-1 font-mono text-yellow-300 font-bold flex items-center justify-between">
+            <div id="gpsCoordsDisplay" class="hidden mt-1 font-mono text-[#004B97] font-bold flex items-center justify-between">
               <span id="coordsText"></span>
-              <a id="testMapLink" href="#" target="_blank" class="text-[11px] underline text-blue-400 ml-2">在地圖查看 ↗</a>
+              <a id="testMapLink" href="#" target="_blank" class="text-[11px] underline text-blue-600 ml-2 font-sans font-bold">在 Google Maps 查看 ↗</a>
             </div>
           </div>
         </div>
 
         <!-- 現場拍照 -->
         <div>
-          <label class="block text-slate-400 font-semibold mb-1">④ 現場路口照片 (直接相機拍攝)</label>
+          <label class="block text-[#0F2745] font-bold mb-1">④ 現場路口照片 (直接手機拍照)</label>
           <div class="flex items-center space-x-2">
             <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleImageSelected(event)" class="hidden">
-            <button type="button" onclick="document.getElementById('cameraInput').click()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-yellow-300 font-bold px-3 py-2 rounded-xl flex items-center active:scale-95 transition">
-              <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
+            <button type="button" onclick="document.getElementById('cameraInput').click()" class="bg-white hover:bg-slate-50 border border-blue-200 text-[#004B97] font-bold px-3.5 py-2 rounded-xl flex items-center active:scale-95 transition shadow-sm">
+              <svg class="w-4 h-4 mr-1.5 text-[#004B97]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
               📷 開啟相機拍照
             </button>
-            <span id="photoFileName" class="text-slate-400 text-[11px]">未選擇照片 (建議拍照以便確認路口)</span>
+            <span id="photoFileName" class="text-[#5b7290] text-[11px]">未選擇照片 (建議拍照確認路口)</span>
           </div>
 
           <div id="imgPreviewWrapper" class="hidden mt-2 relative">
-            <img id="imgPreview" class="max-h-40 rounded-xl border border-slate-700 object-cover w-full" alt="現場預覽">
-            <button type="button" onclick="removePhoto()" class="absolute top-2 right-2 bg-black/80 hover:bg-black text-white rounded-full p-1 text-xs">✕ 移除</button>
+            <img id="imgPreview" class="max-h-44 rounded-xl border border-blue-200 object-cover w-full shadow-sm" alt="現場預覽">
+            <button type="button" onclick="removePhoto()" class="absolute top-2 right-2 bg-black/70 hover:bg-black text-white rounded-full p-1 text-xs">✕ 移除</button>
           </div>
         </div>
 
         <!-- 現場狀況 -->
         <div>
-          <label class="block text-slate-400 font-semibold mb-1">⑤ 現場路況補充 (選填)</label>
-          <input type="text" id="statusNote" placeholder="例如：此路口視線良好、對向車流少、已就位..." class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-slate-100 focus:ring-2 focus:ring-yellow-400">
+          <label class="block text-[#0F2745] font-bold mb-1">⑤ 現場路況備註 (選填)</label>
+          <input type="text" id="statusNote" placeholder="例如：此路口視線良好、已就位..." class="w-full bg-[#F0F8FF] border border-blue-200 rounded-xl p-2.5 text-[#0F2745] focus:ring-2 focus:ring-[#004B97] focus:outline-none">
         </div>
 
         <!-- 送出按鈕 -->
         <div class="pt-1">
-          <button type="submit" id="submitCheckInBtn" class="w-full bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black py-3 rounded-xl shadow-lg flex items-center justify-center text-sm active:scale-98 transition">
+          <button type="submit" id="submitCheckInBtn" class="w-full btn-gradient font-black py-3 rounded-xl shadow-md flex items-center justify-center text-sm active:scale-98 transition">
             <svg id="submitSpinner" class="w-4 h-4 mr-2 animate-spin hidden" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
             <span id="submitBtnText">🚀 送出打卡（座標與照片寫入總表）</span>
           </button>
@@ -269,90 +279,92 @@
       </form>
 
       <!-- 成功提示 -->
-      <div id="checkInSuccessBox" class="hidden mt-3 p-3 bg-green-950/80 border border-green-500 rounded-xl text-green-300 text-xs">
-        <div class="font-bold text-sm text-green-400 mb-0.5">✅ 打卡成功！</div>
+      <div id="checkInSuccessBox" class="hidden mt-3 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs">
+        <div class="font-bold text-sm text-emerald-900 mb-0.5">✅ 打卡成功！</div>
         <div>您的座標與照片已寫入雲端試算表與 Google Drive。</div>
         <div id="successShareLine" class="mt-2"></div>
       </div>
     </section>
 
-    <!-- ================= 交管人員名冊與快速撥號 ================= -->
-    <section class="bg-slate-900 border border-slate-800 rounded-xl p-3.5">
-      <div class="flex items-center justify-between mb-2.5">
-        <h3 class="text-xs font-bold text-yellow-400 flex items-center">
-          <svg class="w-4 h-4 mr-1 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-          交管夥伴名冊與通訊錄 (共 11 員)
+    <!-- ================= 交管人員名冊 (已取消電話與機動，只顯示姓名與到崗狀態) ================= -->
+    <section class="card-base p-4">
+      <div class="flex items-center justify-between mb-3 border-b border-blue-100 pb-2">
+        <h3 class="text-xs font-black text-[#004B97] flex items-center">
+          <svg class="w-4 h-4 mr-1 text-[#004B97]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          交管出勤名冊 (共 11 員)
         </h3>
-        <span class="text-[11px] text-slate-400">點電話可直接撥打</span>
+        <span class="text-[11px] text-[#5b7290]" id="rosterStatusCount">就位進度：載入中...</span>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs" id="rosterList">
-        <!-- 動態產生 -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="rosterList">
+        <!-- 動態產生乾淨的名冊卡片 -->
       </div>
     </section>
 
-    <!-- ================= 最新打卡與座標統計列表 ================= -->
-    <section class="bg-slate-900 border border-slate-800 rounded-xl p-3.5">
-      <div class="flex items-center justify-between mb-2">
-        <h3 class="text-xs font-bold text-yellow-400 flex items-center">
-          <svg class="w-4 h-4 mr-1 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-          現場就位打卡記錄（即時統計）
-        </h3>
-        <span id="checkedInCountBadge" class="text-[11px] bg-slate-800 text-yellow-400 px-2 py-0.5 rounded font-bold">已打卡: 0 員</span>
+    <!-- ================= 📸 即時現場照片與打卡動態 (解決照片看不見問題) ================= -->
+    <section class="card-base p-4">
+      <div class="flex items-center justify-between mb-3 border-b border-blue-100 pb-2">
+        <div>
+          <h3 class="text-sm font-black text-[#004B97] flex items-center">
+            📸 現場即時打卡照片牆
+          </h3>
+          <p class="text-[11px] text-[#5b7290]">每 15 秒自動同步雲端試算表最新照片</p>
+        </div>
+        <span id="checkedInCountBadge" class="text-xs bg-blue-100 text-[#004B97] px-2.5 py-1 rounded-full font-black">
+          已收到: 0 筆
+        </span>
       </div>
 
-      <div id="checkInRecordList" class="space-y-2 text-xs">
-        <div class="text-center py-6 text-slate-500">
-          尚未有人員打卡回報。被放點後請在上方進行打卡！
+      <div id="checkInRecordList" class="space-y-3">
+        <div class="text-center py-8 text-[#5b7290] text-xs">
+          <div class="inline-block animate-spin w-5 h-5 border-2 border-[#004B97] border-t-transparent rounded-full mb-2"></div>
+          <div>正在從雲端載入最新照片與座標...</div>
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- ================= 設定 Modal (輸入 Google Apps Script URL) ================= -->
-  <div id="settingsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-5 text-slate-100 shadow-2xl space-y-4 text-xs">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-        <h3 class="font-bold text-sm text-yellow-400">⚙️ Google Apps Script 後端設定</h3>
-        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-200 text-lg">✕</button>
+  <!-- ================= 照片全螢幕燈箱 Modal ================= -->
+  <div id="lightboxModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3" onclick="closeLightbox()">
+    <div class="max-w-xl w-full relative" onclick="event.stopPropagation()">
+      <button onclick="closeLightbox()" class="absolute -top-10 right-0 text-white hover:text-rose-400 font-bold text-lg p-2">✕ 關閉</button>
+      <img id="lightboxImg" class="w-full max-h-[80vh] object-contain rounded-xl shadow-2xl" alt="大圖檢視">
+      <div id="lightboxCaption" class="mt-2 text-white text-xs text-center font-medium"></div>
+    </div>
+  </div>
+
+  <!-- ================= 設定 Modal ================= -->
+  <div id="settingsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 text-[#0F2745] shadow-2xl space-y-4 text-xs">
+      <div class="flex items-center justify-between border-b pb-2">
+        <h3 class="font-bold text-sm text-[#004B97]">⚙️ Google Apps Script 後端設定</h3>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
       </div>
 
       <div class="space-y-3">
-        <p class="text-slate-300">
-          請貼入您在 Google Apps Script 發布的 <strong>網頁應用程式網址 (Web app URL)</strong>：
+        <p class="text-[#5b7290]">
+          目前已自動綁定 Google Apps Script 網頁應用程式網址：
         </p>
         <div>
-          <label class="block text-slate-400 font-medium mb-1">Web App URL</label>
-          <input type="url" id="gasUrlInput" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-slate-100 focus:ring-2 focus:ring-yellow-400">
+          <label class="block text-[#0F2745] font-semibold mb-1">Web App URL</label>
+          <input type="url" id="gasUrlInput" class="w-full bg-[#F0F8FF] border border-blue-200 rounded-lg p-2 text-xs text-[#004B97] focus:ring-2 focus:ring-[#004B97] focus:outline-none">
         </div>
-        <p class="text-[11px] text-slate-400">
-          💡 打卡時會自動將經緯度、Google Maps 連結與照片存入 Google Sheet 與 Google Drive。
-        </p>
       </div>
 
       <div class="flex justify-end space-x-2 pt-2">
-        <button onclick="saveGasUrl()" class="bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-bold px-4 py-2 rounded-lg">儲存設定</button>
-        <button onclick="closeSettingsModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg">關閉</button>
+        <button onclick="saveGasUrl()" class="btn-gradient font-bold px-4 py-2 rounded-lg">儲存設定</button>
+        <button onclick="closeSettingsModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg">關閉</button>
       </div>
     </div>
   </div>
 
   <!-- ================= 核心 JavaScript ================= -->
   <script>
-    // 交管名單人員清單
-    const ROSTER = [
-      { name: "楊皓柄", role: "147線機車站崗", phone: "0912-345-678" },
-      { name: "陳皇秀", role: "147線機車站崗", phone: "0922-345-678" },
-      { name: "林佳欣", role: "147線機車站崗", phone: "0932-345-678" },
-      { name: "賴慧慈", role: "147線機車站崗", phone: "0942-345-678" },
-      { name: "張玉岑", role: "147線機車站崗", phone: "0952-345-678" },
-      { name: "葉子毅", role: "147線機車站崗", phone: "0962-345-678" },
-      { name: "李大衛", role: "147線機車站崗", phone: "0972-345-678" },
-      { name: "卜湘芸", role: "147線機車站崗", phone: "0982-345-678" },
-      { name: "李宥霆", role: "147線機車站崗", phone: "0992-345-678" },
-      { name: "溫碧玉", role: "147線機動巡邏", phone: "0900-111-222" },
-      { name: "劉雯伶", role: "147線機動巡邏", phone: "0900-333-444" }
+    // 11 位交管名單 (無電話、無機動標籤)
+    const ROSTER_NAMES = [
+      "楊皓柄", "陳皇秀", "林佳欣", "賴慧慈", "張玉岑",
+      "葉子毅", "李大衛", "溫碧玉", "劉雯伶", "卜湘芸", "李宥霆"
     ];
 
     const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycby4GL3hYmIk5YGqT5ysT5Vr35ee3MkgcQSxpBqBbmTX3cDbIJ1JAXu0VSj8ZTCFIjad/exec";
@@ -361,49 +373,51 @@
     let currentLng = null;
     let currentAccuracy = null;
     let compressedPhotoBase64 = '';
+    let onlineDataCache = [];
 
     document.addEventListener("DOMContentLoaded", () => {
-      // 若尚未設定，自動寫入預設後端 URL
-      if (!localStorage.getItem("gas_web_app_url")) {
-        localStorage.setItem("gas_web_app_url", DEFAULT_GAS_URL);
-      }
       renderRoster();
-      loadStoredRecords();
       fetchOnlineRecords();
+      // 每 15 秒自動輪詢雲端試算表一次，即時看見別人拍照
+      setInterval(fetchOnlineRecords, 15000);
     });
 
-    // 渲染通訊錄
+    // 渲染名冊 (乾淨簡約標籤)
     function renderRoster() {
       const container = document.getElementById("rosterList");
       container.innerHTML = "";
 
-      ROSTER.forEach(person => {
+      let checkedInCount = 0;
+
+      ROSTER_NAMES.forEach(name => {
+        // 比對是否已打卡
+        const userRecord = onlineDataCache.find(r => r.userName && r.userName.includes(name));
+        const isChecked = !!userRecord;
+        if (isChecked) checkedInCount++;
+
         const item = document.createElement("div");
-        const isMotor = person.role.includes("巡邏") || person.role.includes("機巡");
-        item.className = "flex items-center justify-between p-2 rounded-lg bg-slate-800/60 border border-slate-700/60";
+        item.className = `p-2.5 rounded-xl border flex items-center justify-between transition-all ${
+          isChecked 
+            ? 'bg-emerald-50/70 border-emerald-300 shadow-sm' 
+            : 'bg-[#F0F8FF]/80 border-blue-100 text-slate-600'
+        }`;
+
         item.innerHTML = `
-          <div>
-            <div class="font-bold text-slate-100 flex items-center">
-              ${person.name}
-              <span class="ml-1.5 text-[10px] ${isMotor ? 'bg-orange-500/20 text-orange-300' : 'bg-slate-700 text-slate-300'} px-1.5 py-0.2 rounded font-normal">
-                ${person.role}
-              </span>
-            </div>
+          <div class="font-bold text-xs ${isChecked ? 'text-emerald-900' : 'text-[#0F2745]'}">
+            ${name}
           </div>
-          <a href="tel:${person.phone}" class="bg-slate-700 hover:bg-slate-600 text-yellow-300 px-2.5 py-1 rounded text-xs flex items-center active:scale-95 transition">
-            <svg class="w-3 h-3 mr-1 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-            撥打
-          </a>
+          <span class="text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+            isChecked 
+              ? 'bg-emerald-600 text-white' 
+              : 'bg-slate-200/80 text-slate-500'
+          }">
+            ${isChecked ? (userRecord.pointId ? userRecord.pointId.split(' ')[0] : '已到崗') : '未就位'}
+          </span>
         `;
         container.appendChild(item);
       });
-    }
 
-    // 當選取姓名時，自動記憶
-    function onNameChange(name) {
-      if (name.includes("溫碧玉") || name.includes("劉雯伶")) {
-        document.getElementById("assignedPoint").value = "M01 (147線全程機巡組)";
-      }
+      document.getElementById("rosterStatusCount").textContent = `就位進度：${checkedInCount} / ${ROSTER_NAMES.length} 員`;
     }
 
     // 取得手機 GPS 經緯度
@@ -415,11 +429,11 @@
       const mapLink = document.getElementById("testMapLink");
 
       if (!navigator.geolocation) {
-        statusText.textContent = "您的手機瀏覽器不支援 GPS 定位功能。";
+        statusText.textContent = "您的手機不支援 GPS 定位。";
         return;
       }
 
-      statusText.textContent = "正在透過衛星取得精確座標中，請稍候...";
+      statusText.textContent = "正在透過衛星取得經緯度，請稍候...";
       gpsBtn.disabled = true;
 
       navigator.geolocation.getCurrentPosition(
@@ -428,7 +442,7 @@
           currentLng = position.coords.longitude.toFixed(6);
           currentAccuracy = Math.round(position.coords.accuracy);
 
-          statusText.textContent = `✅ 定位成功！(精準度約 ±${currentAccuracy} 公尺)`;
+          statusText.textContent = `✅ 定位成功！(精準度 ±${currentAccuracy}m)`;
           coordsText.textContent = `${currentLat}, ${currentLng}`;
           mapLink.href = `https://www.google.com/maps?q=${currentLat},${currentLng}`;
           display.classList.remove("hidden");
@@ -436,37 +450,19 @@
         },
         (error) => {
           gpsBtn.disabled = false;
-          let msg = "定位失敗: ";
-          switch(error.code) {
-            case error.PERMISSION_DENIED:
-              msg += "請在手機設定中允許瀏覽器取得位置權限。";
-              break;
-            case error.POSITION_UNAVAILABLE:
-              msg += "位置資訊無法取得（山區可稍候再試）。";
-              break;
-            case error.TIMEOUT:
-              msg += "定位逾時，請再按一次。";
-              break;
-            default:
-              msg += error.message;
-          }
-          statusText.textContent = msg;
+          statusText.textContent = "定位未完成，請確認手機已開啟位置存取權限。";
         },
-        {
-          enableHighAccuracy: true,
-          timeout: 15000,
-          maximumAge: 0
-        }
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
       );
     }
 
-    // 處理圖片選擇與前端 Canvas 壓縮 (壓縮到 1200px 內，約 200KB-400KB)
+    // 處理圖片選擇與前端 Canvas 壓縮 (1200px 內，壓縮至 250KB 左右秒傳)
     function handleImageSelected(e) {
       const file = e.target.files[0];
       if (!file) return;
 
       const fileNameLabel = document.getElementById("photoFileName");
-      fileNameLabel.textContent = "壓縮圖片中...";
+      fileNameLabel.textContent = "壓縮照片中...";
 
       const reader = new FileReader();
       reader.onload = function(evt) {
@@ -495,7 +491,7 @@
 
           document.getElementById("imgPreview").src = compressedPhotoBase64;
           document.getElementById("imgPreviewWrapper").classList.remove("hidden");
-          fileNameLabel.textContent = `已就緒 (${Math.round(compressedPhotoBase64.length * 0.75 / 1024)} KB)`;
+          fileNameLabel.textContent = `照片已就緒 (${Math.round(compressedPhotoBase64.length * 0.75 / 1024)} KB)`;
         };
         img.src = evt.target.result;
       };
@@ -507,7 +503,7 @@
       compressedPhotoBase64 = '';
       document.getElementById("cameraInput").value = '';
       document.getElementById("imgPreviewWrapper").classList.add("hidden");
-      document.getElementById("photoFileName").textContent = "未選擇照片 (建議拍照以便確認路口)";
+      document.getElementById("photoFileName").textContent = "未選擇照片 (建議拍照確認路口)";
     }
 
     // 送出打卡
@@ -519,7 +515,7 @@
       const note = document.getElementById("statusNote").value;
 
       if (!currentLat || !currentLng) {
-        if (!confirm("尚未取得 GPS 座標，確定要直接送出嗎？建議先點擊「📍 點我抓取目前 GPS」喔！")) {
+        if (!confirm("尚未抓取 GPS 座標，確定要直接送出嗎？建議先點「📍 抓取目前 GPS」定位喔！")) {
           return;
         }
       }
@@ -547,53 +543,36 @@
       const gasUrl = localStorage.getItem("gas_web_app_url") || DEFAULT_GAS_URL;
 
       try {
-        if (gasUrl) {
-          const res = await fetch(gasUrl, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload)
-          });
-          const resData = await res.json();
-          console.log("GAS 寫入成功:", resData);
-        }
+        const res = await fetch(gasUrl, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        const resData = await res.json();
+        console.log("GAS 寫入成功:", resData);
 
-        // 存入本機記錄
-        const record = {
-          userName,
-          pointId,
-          lat: currentLat,
-          lng: currentLng,
-          accuracy: currentAccuracy,
-          note,
-          hasPhoto: !!compressedPhotoBase64,
-          time: new Date().toLocaleTimeString()
-        };
-
-        const records = JSON.parse(localStorage.getItem("all_checkins") || "[]");
-        records.unshift(record);
-        localStorage.setItem("all_checkins", JSON.stringify(records));
-
-        // 顯示成功區塊
+        // 成功提示
         const successBox = document.getElementById("checkInSuccessBox");
         successBox.classList.remove("hidden");
 
         const shareDiv = document.getElementById("successShareLine");
         if (currentLat && currentLng) {
           const mapUrl = `https://www.google.com/maps?q=${currentLat},${currentLng}`;
-          const lineMsg = encodeURIComponent(`【2026環法147線交管】${userName} 已到崗！點位：${pointId}，座標位置：${mapUrl}`);
+          const lineMsg = encodeURIComponent(`【2026環法147交管】${userName} 已到崗！點位：${pointId}，座標位置：${mapUrl}`);
           shareDiv.innerHTML = `
-            <a href="https://line.me/R/msg/text/?${lineMsg}" target="_blank" class="inline-block bg-green-500 hover:bg-green-600 text-white font-black px-3 py-2 rounded-xl text-xs mt-1 shadow active:scale-95 transition">
+            <a href="https://line.me/R/msg/text/?${lineMsg}" target="_blank" class="inline-block bg-[#06C755] hover:bg-[#05a847] text-white font-bold px-3 py-2 rounded-xl text-xs mt-1 shadow-sm active:scale-95 transition">
               📲 轉傳打卡座標至 LINE 群組
             </a>
           `;
         }
 
-        loadStoredRecords();
+        // 立即觸發雲端刷新
+        fetchOnlineRecords();
         successBox.scrollIntoView({ behavior: "smooth", block: "center" });
 
       } catch (err) {
-        alert("打卡資料已保存在手機本機！若山區網路較弱，可點擊下方綠色按鈕轉發至 LINE。");
-        loadStoredRecords();
+        alert("打卡資料已送出！若此處山區訊號較慢，可點擊下方綠色按鈕轉發至 LINE。");
+        fetchOnlineRecords();
       } finally {
         submitBtn.disabled = false;
         spinner.classList.add("hidden");
@@ -601,13 +580,7 @@
       }
     }
 
-    // 載入顯示打卡記錄
-    function loadStoredRecords() {
-      const records = JSON.parse(localStorage.getItem("all_checkins") || "[]");
-      renderRecords(records);
-    }
-
-    // 從 Google Apps Script 讀取線上打卡統計
+    // 從 Google Apps Script 讀取線上所有人的打卡與照片
     async function fetchOnlineRecords() {
       const gasUrl = localStorage.getItem("gas_web_app_url") || DEFAULT_GAS_URL;
       if (!gasUrl) return;
@@ -615,60 +588,116 @@
       try {
         const res = await fetch(`${gasUrl}?action=get`);
         const resJson = await res.json();
-        if (resJson.status === "success" && resJson.data && resJson.data.length > 0) {
-          renderRecords(resJson.data);
+        if (resJson.status === "success" && Array.isArray(resJson.data)) {
+          onlineDataCache = resJson.data;
+          renderPhotoWall(onlineDataCache);
+          renderRoster(); // 同步更新名冊就位狀態
+          document.getElementById("syncBadge").classList.remove("hidden");
         }
       } catch (e) {
-        console.log("讀取線上統計失敗，顯示本機資料:", e);
+        console.log("讀取線上統計失敗:", e);
       }
     }
 
-    function renderRecords(records) {
+    // 渲染照片牆與打卡動態 (直接在網頁秀出別人拍的照片！)
+    function renderPhotoWall(records) {
       const container = document.getElementById("checkInRecordList");
       const badge = document.getElementById("checkedInCountBadge");
-      
+
       if (!records || records.length === 0) {
-        container.innerHTML = `<div class="text-center py-6 text-slate-500">尚未有人員打卡回報。被放點後請在上方進行打卡！</div>`;
-        badge.textContent = `已打卡: 0 員`;
+        container.innerHTML = `<div class="text-center py-8 text-[#5b7290] text-xs">目前尚無人打卡回報。被放點後請在上方進行打卡！</div>`;
+        badge.textContent = `已收到: 0 筆`;
         return;
       }
 
-      badge.textContent = `已打卡: ${records.length} 員`;
+      badge.textContent = `已收到: ${records.length} 筆`;
       container.innerHTML = "";
 
-      records.forEach(r => {
-        const row = document.createElement("div");
-        row.className = "p-2.5 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-between";
-        
+      // 依時間倒序排列（最新的在最上面）
+      const reversed = [...records].reverse();
+
+      reversed.forEach(r => {
+        const card = document.createElement("div");
+        card.className = "p-3.5 rounded-2xl bg-white border border-blue-100 shadow-sm space-y-2";
+
         const mapHref = r.mapLink || (r.lat ? `https://www.google.com/maps?q=${r.lat},${r.lng}` : null);
 
-        row.innerHTML = `
-          <div>
-            <div class="font-bold text-slate-100 flex items-center">
-              <span class="text-yellow-400 mr-1.5 font-mono">${r.pointId || '點位'}</span>
-              <span>${r.userName}</span>
-              <span class="ml-2 text-[10px] bg-green-500/20 text-green-300 px-1.5 rounded">🟢 已就位</span>
+        // 轉換 Google Drive 連結為可直接在網頁顯示的圖片 URL
+        let directImgUrl = null;
+        if (r.photoUrl && r.photoUrl.indexOf("http") !== -1) {
+          const driveMatch = r.photoUrl.match(/(?:\/d\/|id=)([a-zA-Z0-9_-]{25,})/);
+          if (driveMatch && driveMatch[1]) {
+            const fileId = driveMatch[1];
+            directImgUrl = `https://lh3.googleusercontent.com/d/${fileId}`;
+          }
+        }
+
+        // 時間格式化
+        let displayTime = r.time;
+        if (displayTime && displayTime.includes("T")) {
+          const d = new Date(displayTime);
+          displayTime = `${(d.getHours()+8)%24 < 10 ? '0' : ''}${(d.getHours()+8)%24}:${d.getMinutes() < 10 ? '0' : ''}${d.getMinutes()}`;
+        }
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="bg-[#004B97] text-white text-[11px] font-black px-2 py-0.5 rounded-md">
+                ${r.pointId || '點位'}
+              </span>
+              <span class="font-black text-sm text-[#0F2745]">${r.userName}</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.2 rounded-full">
+                🟢 已到崗
+              </span>
             </div>
-            <div class="text-[11px] text-slate-400 mt-0.5">
-              時間: ${r.time || ''} ${r.accuracy ? `(${r.accuracy})` : ''}
-              ${r.note ? ` · <span class="text-slate-300">${r.note}</span>` : ''}
+            <div class="text-[11px] text-[#5b7290] font-mono">
+              ${displayTime || ''}
             </div>
           </div>
-          <div class="flex items-center space-x-1.5">
+
+          <!-- 現場照片直接秀出 -->
+          ${directImgUrl ? `
+            <div class="mt-2 relative group cursor-pointer" onclick="openLightbox('${directImgUrl}', '${r.userName} - ${r.pointId}')">
+              <img src="${directImgUrl}" 
+                   class="w-full max-h-52 object-cover rounded-xl border border-blue-100/80 shadow-sm transition hover:opacity-95" 
+                   alt="現場路口照" 
+                   loading="lazy"
+                   onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=${r.photoUrl.match(/(?:\/d\/|id=)([a-zA-Z0-9_-]{25,})/)?.[1]}&sz=w800'">
+              <div class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center">
+                🔍 點擊看大圖
+              </div>
+            </div>
+          ` : `
+            <div class="text-[11px] text-slate-400 bg-slate-50 p-2 rounded-lg text-center mt-1">
+              (此筆打卡未附相片)
+            </div>
+          `}
+
+          <!-- 備註與 GPS 連結 -->
+          <div class="flex items-center justify-between pt-1 text-xs">
+            <div class="text-[#5b7290] truncate max-w-[65%]">
+              ${r.note ? `💬 <span>${r.note}</span>` : `<span class="text-slate-400 text-[11px]">無備註</span>`}
+            </div>
             ${mapHref ? `
-              <a href="${mapHref}" target="_blank" class="bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white px-2 py-1 rounded text-xs transition">
-                🗺️ 看位置
-              </a>
-            ` : ''}
-            ${r.photoUrl ? `
-              <a href="${r.photoUrl}" target="_blank" class="bg-yellow-400/20 hover:bg-yellow-400 text-yellow-300 hover:text-slate-950 px-2 py-1 rounded text-xs transition">
-                📷 看照片
+              <a href="${mapHref}" target="_blank" class="bg-blue-50 hover:bg-blue-100 text-[#004B97] font-bold text-xs px-2.5 py-1 rounded-lg border border-blue-200/60 flex items-center transition">
+                🗺️ 看 GPS 位置
               </a>
             ` : ''}
           </div>
         `;
-        container.appendChild(row);
+
+        container.appendChild(card);
       });
+    }
+
+    // 燈箱大圖
+    function openLightbox(imgUrl, caption) {
+      document.getElementById("lightboxImg").src = imgUrl;
+      document.getElementById("lightboxCaption").textContent = caption || '';
+      document.getElementById("lightboxModal").classList.remove("hidden");
+    }
+    function closeLightbox() {
+      document.getElementById("lightboxModal").classList.add("hidden");
     }
 
     // 重新整理
@@ -676,13 +705,13 @@
       const icon = document.getElementById("refreshIcon");
       icon.classList.add("animate-spin");
       fetchOnlineRecords().finally(() => {
-        setTimeout(() => icon.classList.remove("animate-spin"), 600);
+        setTimeout(() => icon.classList.remove("animate-spin"), 500);
       });
     }
 
     // 設定 Modal 管理
     function openSettingsModal() {
-      document.getElementById("gasUrlInput").value = localStorage.getItem("gas_web_app_url") || "";
+      document.getElementById("gasUrlInput").value = localStorage.getItem("gas_web_app_url") || DEFAULT_GAS_URL;
       document.getElementById("settingsModal").classList.remove("hidden");
     }
     function closeSettingsModal() {
@@ -691,7 +720,7 @@
     function saveGasUrl() {
       const url = document.getElementById("gasUrlInput").value.trim();
       localStorage.setItem("gas_web_app_url", url);
-      alert("Google Apps Script 後端網址已儲存！");
+      alert("設定已儲存！");
       closeSettingsModal();
       fetchOnlineRecords();
     }
