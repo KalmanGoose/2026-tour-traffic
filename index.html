@@ -156,6 +156,70 @@
       </div>
     </section>
 
+    <!-- ================= 📲 Velodash 實時賽況追蹤 ＆ 🎥 全球直播執勤守則 ================= -->
+    <section class="card-base p-4 border-blue-200/80 bg-gradient-to-br from-white via-blue-50/30 to-emerald-50/30 space-y-3">
+      <!-- Velodash App 追蹤 -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-blue-100">
+        <div>
+          <div class="flex items-center space-x-1.5">
+            <span class="text-base">📲</span>
+            <h3 class="font-black text-sm text-[#004B97]">Velodash 實時賽況位置 (觀賽模式)</h3>
+          </div>
+          <p class="text-[11px] text-[#5b7290] mt-0.5">
+            點擊開啟 App 觀賽模式，即可精準掌握<strong>最前鋒領先集團</strong>與<strong>最後方尾車</strong>位置！
+          </p>
+        </div>
+        <a href="https://velodash.page.link/eKJ3" target="_blank" class="inline-flex items-center justify-center bg-[#004B97] hover:bg-[#003a75] text-white font-black px-4 py-2 rounded-xl text-xs shadow-sm active:scale-95 transition whitespace-nowrap">
+          <span>開啟 Velodash 追蹤 ↗</span>
+        </a>
+      </div>
+
+      <!-- 全球直播執勤形象守則 -->
+      <div class="space-y-2 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="font-black text-rose-700 flex items-center text-xs">
+            <span class="mr-1">🎥</span> 全球直播執勤形象守則
+          </span>
+          <span class="text-[10px] bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded-full">今年全球直播</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+          <div class="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-950 font-bold flex items-start space-x-2">
+            <span class="text-base leading-none">🚩</span>
+            <div>
+              <span class="text-[#004B97]">車隊通過路口時：</span>
+              請務必站立並<strong>全力揮舞旗子指引方向</strong>！
+            </div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-white border border-blue-100 text-[#0F2745] flex items-start space-x-2">
+            <span class="text-base leading-none">🦟</span>
+            <div>
+              <span class="font-bold text-[#004B97]">防蚊提醒：</span>
+              沿線範圍小黑蚊極多，建議盡量穿長褲防叮咬。
+            </div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-white border border-blue-100 text-[#0F2745] flex items-start space-x-2">
+            <span class="text-base leading-none">📵</span>
+            <div>
+              <span class="font-bold text-rose-600">勿滑手機：</span>
+              車隊通過時切勿低頭滑手機，保持專注警戒。
+            </div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-white border border-blue-100 text-[#0F2745] flex items-start space-x-2">
+            <span class="text-base leading-none">🚭</span>
+            <div>
+              <span class="font-bold text-rose-600">全面禁菸：</span>
+              執勤期間維護國際賽事形象，嚴禁吸菸。
+            </div>
+          </div>
+        </div>
+
+        <div class="p-2 rounded-lg bg-blue-50/80 border border-blue-200/60 text-[#004B97] text-[11px] leading-relaxed">
+          🛡️ <strong>核心任務：</strong>在路口引導參賽者進入正式賽道，並提前勸導當地一般用路人減速靠邊行駛。
+        </div>
+      </div>
+    </section>
+
     <!-- ================= 賽事時程與地圖導航 ================= -->
     <section class="card-base p-4 text-xs space-y-2.5">
       <div class="flex items-center justify-between border-b border-blue-100 pb-2">
@@ -316,6 +380,125 @@
         <div class="font-bold text-sm text-emerald-900 mb-0.5">✅ 打卡成功！</div>
         <div>您的座標與照片已寫入雲端試算表與 Google Drive。</div>
         <div id="successShareLine" class="mt-2"></div>
+      </div>
+    </section>
+
+    <!-- ================= 💬 會場常見問題 QA 速查 (應對路人/選手詢問) ================= -->
+    <section class="card-base p-4 space-y-3">
+      <div class="flex items-center justify-between border-b border-blue-100 pb-2">
+        <div>
+          <h3 class="text-sm font-black text-[#004B97] flex items-center">
+            💬 現場問答速查 (路人／選手常見問題)
+          </h3>
+          <p class="text-[11px] text-[#5b7290]">若遇民眾或參賽者詢問，可點擊展開查看標準答覆</p>
+        </div>
+        <span class="text-[10px] bg-blue-100 text-[#004B97] font-bold px-2 py-0.5 rounded-full">共 8 題</span>
+      </div>
+
+      <div class="space-y-2 text-xs" id="faqAccordion">
+        <!-- Q1 -->
+        <details class="group bg-[#F0F8FF] rounded-xl p-3 border border-blue-100 open:bg-blue-50/70 transition">
+          <summary class="font-bold text-[#0F2745] cursor-pointer list-none flex items-center justify-between">
+            <span class="flex items-center text-[#004B97]">
+              <span class="mr-1.5 font-mono font-black text-blue-600">Q1</span> 車手見面會在哪邊、幾點？
+            </span>
+            <span class="text-blue-500 font-bold group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div class="mt-2 text-[#5b7290] pl-6 leading-relaxed border-t border-blue-200/50 pt-2">
+            在<strong>環法村</strong>，分兩個梯次：<strong>10:20-10:40</strong>、<strong>12:00</strong>。記得先去排隊拿號碼牌，特別注意：<strong>29k 選手只能參加 10 點場</strong>！
+          </div>
+        </details>
+
+        <!-- Q2 -->
+        <details class="group bg-[#F0F8FF] rounded-xl p-3 border border-blue-100 open:bg-blue-50/70 transition">
+          <summary class="font-bold text-[#0F2745] cursor-pointer list-none flex items-center justify-between">
+            <span class="flex items-center text-[#004B97]">
+              <span class="mr-1.5 font-mono font-black text-blue-600">Q2</span> 可以到拱門前面等車手回來嗎？
+            </span>
+            <span class="text-blue-500 font-bold group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div class="mt-2 text-[#5b7290] pl-6 leading-relaxed border-t border-blue-200/50 pt-2">
+            可以，但<strong>建議不要帶單車過去</strong>以免危險。歡迎到官方商品販售區購買牛鈴，一起搖鈴歡迎車手完賽！
+          </div>
+        </details>
+
+        <!-- Q3 -->
+        <details class="group bg-[#F0F8FF] rounded-xl p-3 border border-blue-100 open:bg-blue-50/70 transition">
+          <summary class="font-bold text-[#0F2745] cursor-pointer list-none flex items-center justify-between">
+            <span class="flex items-center text-[#004B97]">
+              <span class="mr-1.5 font-mono font-black text-blue-600">Q3</span> 環法村是做什麼的？怎麼那麼大？
+            </span>
+            <span class="text-blue-500 font-bold group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div class="mt-2 text-[#5b7290] pl-6 leading-relaxed border-t border-blue-200/50 pt-2">
+            一個是主要賽事活動進行會場；<strong>環法村</strong>是為了讓大家宛如置身法國小鎮而精心設計的特色市集！現場有豐富展出攤位，展出時間為 <strong>05:40 - 15:00</strong>。
+          </div>
+        </details>
+
+        <!-- Q4 -->
+        <details class="group bg-[#F0F8FF] rounded-xl p-3 border border-blue-100 open:bg-blue-50/70 transition">
+          <summary class="font-bold text-[#0F2745] cursor-pointer list-none flex items-center justify-between">
+            <span class="flex items-center text-[#004B97]">
+              <span class="mr-1.5 font-mono font-black text-blue-600">Q4</span> 我要在哪裡查詢我的完賽成績？
+            </span>
+            <span class="text-blue-500 font-bold group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div class="mt-2 text-[#5b7290] pl-6 leading-relaxed border-t border-blue-200/50 pt-2">
+            請前往大會「成績查詢處」：<strong>面對主舞台右手邊的第三個帳篷</strong>，現場備有 QRCode 掃描即可查詢即時成績！
+          </div>
+        </details>
+
+        <!-- Q5 -->
+        <details class="group bg-[#F0F8FF] rounded-xl p-3 border border-blue-100 open:bg-blue-50/70 transition">
+          <summary class="font-bold text-[#0F2745] cursor-pointer list-none flex items-center justify-between">
+            <span class="flex items-center text-[#004B97]">
+              <span class="mr-1.5 font-mono font-black text-blue-600">Q5</span> 今年總共有多少人參加？
+            </span>
+            <span class="text-blue-500 font-bold group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div class="mt-2 text-[#5b7290] pl-6 leading-relaxed border-t border-blue-200/50 pt-2">
+            今年參賽車手全場約 <strong>2,200 人</strong>左右。
+          </div>
+        </details>
+
+        <!-- Q6 -->
+        <details class="group bg-[#F0F8FF] rounded-xl p-3 border border-blue-100 open:bg-blue-50/70 transition">
+          <summary class="font-bold text-[#0F2745] cursor-pointer list-none flex items-center justify-between">
+            <span class="flex items-center text-[#004B97]">
+              <span class="mr-1.5 font-mono font-black text-blue-600">Q6</span> 紐崔萊帳篷有什麼優惠活動？
+            </span>
+            <span class="text-blue-500 font-bold group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div class="mt-2 text-[#5b7290] pl-6 leading-relaxed border-t border-blue-200/50 pt-2">
+            紐崔萊現場設有三個主題帳篷，可<strong>免費試喝蛋白飲</strong>，現場拍照打卡還會免費贈送能量果凍！
+          </div>
+        </details>
+
+        <!-- Q7 -->
+        <details class="group bg-[#F0F8FF] rounded-xl p-3 border border-blue-100 open:bg-blue-50/70 transition">
+          <summary class="font-bold text-[#0F2745] cursor-pointer list-none flex items-center justify-between">
+            <span class="flex items-center text-[#004B97]">
+              <span class="mr-1.5 font-mono font-black text-blue-600">Q7</span> 選手寄物帳篷地點與開放時間？
+            </span>
+            <span class="text-blue-500 font-bold group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div class="mt-2 text-[#5b7290] pl-6 leading-relaxed border-t border-blue-200/50 pt-2">
+            位於<strong>主舞台後方的右斜方</strong>，寄物開放時間為 <strong>04:30 - 12:00</strong>。
+          </div>
+        </details>
+
+        <!-- Q8 -->
+        <details class="group bg-[#F0F8FF] rounded-xl p-3 border border-blue-100 open:bg-blue-50/70 transition">
+          <summary class="font-bold text-[#0F2745] cursor-pointer list-none flex items-center justify-between">
+            <span class="flex items-center text-[#004B97]">
+              <span class="mr-1.5 font-mono font-black text-blue-600">Q8</span> 車手分享會在哪裡、幾點舉行？
+            </span>
+            <span class="text-blue-500 font-bold group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div class="mt-2 text-[#5b7290] pl-6 leading-relaxed border-t border-blue-200/50 pt-2">
+            分享會於 <strong>11:00 - 11:30</strong> 在<strong>會場主舞台</strong>舉行，歡迎前往聆聽！
+          </div>
+        </details>
       </div>
     </section>
 
