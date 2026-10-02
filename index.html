@@ -67,7 +67,7 @@
 <body class="min-h-screen pb-24">
 
   <!-- ================= 頂部導覽列 (匹克球招募同款風格) ================= -->
-  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-blue-900/10 shadow-sm">
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-blue-900/10 shadow-sm">
     <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-2.5">
         <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-[#004B97] to-[#ABDAD5] flex items-center justify-center text-white font-black text-sm shadow-sm">
@@ -82,17 +82,32 @@
       </div>
 
       <div class="flex items-center space-x-2">
-        <div id="syncBadge" class="hidden sm:flex items-center text-[11px] bg-emerald-50 text-emerald-700 px-2 py-1 rounded-full font-bold border border-emerald-200">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
-          即時連線中
-        </div>
         <button onclick="refreshData()" class="text-xs bg-[#F0F8FF] hover:bg-blue-50 text-[#004B97] border border-blue-200 font-bold px-2.5 py-1.5 rounded-lg flex items-center transition active:scale-95">
           <svg id="refreshIcon" class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-          重新整現
+          重新整理
         </button>
-        <button onclick="openSettingsModal()" class="p-1.5 text-slate-400 hover:text-[#004B97] rounded-lg transition" title="後端設定">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-        </button>
+
+        <!-- 管理員權限區塊 -->
+        <div id="adminArea" class="flex items-center space-x-1.5">
+          <!-- 未登入時顯示登入鎖頭 -->
+          <button id="loginBtn" onclick="openLoginModal()" class="text-xs text-slate-500 hover:text-[#004B97] bg-slate-100 hover:bg-blue-50 border border-slate-200 px-2.5 py-1.5 rounded-lg font-bold flex items-center transition" title="管理員登入">
+            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            管理登入
+          </button>
+
+          <!-- 登入後顯示管理員標籤與設定按鈕 -->
+          <div id="adminBadgeGroup" class="hidden items-center space-x-1.5">
+            <span class="text-[11px] bg-amber-100 text-amber-900 border border-amber-300 font-black px-2 py-1 rounded-lg flex items-center shadow-xs">
+              🛡️ 管理員
+            </span>
+            <button onclick="openSettingsModal()" class="p-1.5 text-slate-500 hover:text-[#004B97] bg-slate-100 rounded-lg transition" title="系統設定">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </button>
+            <button onclick="handleLogout()" class="text-[11px] text-rose-600 hover:text-rose-700 bg-rose-50 px-2 py-1 rounded-lg font-bold border border-rose-200">
+              登出
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -172,6 +187,24 @@
       </div>
     </section>
 
+    <!-- ================= 👥 交管人員出勤名冊 (點擊卡片直接查看該員照片與定位！) ================= -->
+    <section class="card-base p-4">
+      <div class="flex items-center justify-between mb-3 border-b border-blue-100 pb-2">
+        <div>
+          <h3 class="text-xs font-black text-[#004B97] flex items-center">
+            <svg class="w-4 h-4 mr-1 text-[#004B97]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            交管出勤名冊 (共 11 員)
+          </h3>
+          <p class="text-[10px] text-[#5b7290]">💡 點擊任何人員卡片，即可查看其現場照片與 GPS 位置</p>
+        </div>
+        <span class="text-[11px] text-[#004B97] font-bold" id="rosterStatusCount">就位進度：載入中...</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="rosterList">
+        <!-- 動態產生可點擊查看照片的名冊卡片 -->
+      </div>
+    </section>
+
     <!-- ================= 核心操作：現場放人打卡 ＆ GPS 座標回報 ================= -->
     <section class="card-base p-4 border-2 border-blue-200/80 shadow-md">
       <div class="flex items-center justify-between mb-3 border-b border-blue-100 pb-2">
@@ -187,7 +220,7 @@
       </p>
 
       <form id="checkInForm" onsubmit="handleCheckInSubmit(event)" class="space-y-3 text-xs">
-        <!-- 姓名與點位選取 (已砍掉機動選項) -->
+        <!-- 姓名與點位選取 -->
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-[#0F2745] font-bold mb-1">① 您的姓名 *</label>
@@ -251,7 +284,7 @@
           <div class="flex items-center space-x-2">
             <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleImageSelected(event)" class="hidden">
             <button type="button" onclick="document.getElementById('cameraInput').click()" class="bg-white hover:bg-slate-50 border border-blue-200 text-[#004B97] font-bold px-3.5 py-2 rounded-xl flex items-center active:scale-95 transition shadow-sm">
-              <svg class="w-4 h-4 mr-1.5 text-[#004B97]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              <svg class="w-4 h-4 mr-1.5 text-[#004B97]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
               📷 開啟相機拍照
             </button>
             <span id="photoFileName" class="text-[#5b7290] text-[11px]">未選擇照片 (建議拍照確認路口)</span>
@@ -286,22 +319,7 @@
       </div>
     </section>
 
-    <!-- ================= 交管人員名冊 (已取消電話與機動，只顯示姓名與到崗狀態) ================= -->
-    <section class="card-base p-4">
-      <div class="flex items-center justify-between mb-3 border-b border-blue-100 pb-2">
-        <h3 class="text-xs font-black text-[#004B97] flex items-center">
-          <svg class="w-4 h-4 mr-1 text-[#004B97]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-          交管出勤名冊 (共 11 員)
-        </h3>
-        <span class="text-[11px] text-[#5b7290]" id="rosterStatusCount">就位進度：載入中...</span>
-      </div>
-
-      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="rosterList">
-        <!-- 動態產生乾淨的名冊卡片 -->
-      </div>
-    </section>
-
-    <!-- ================= 📸 即時現場照片與打卡動態 (解決照片看不見問題) ================= -->
+    <!-- ================= 📸 即時現場照片與打卡動態牆 ================= -->
     <section class="card-base p-4">
       <div class="flex items-center justify-between mb-3 border-b border-blue-100 pb-2">
         <div>
@@ -324,6 +342,87 @@
     </section>
 
   </main>
+
+  <!-- ================= 👤 志工點位到崗詳情 Modal (點名冊彈出) ================= -->
+  <div id="volunteerDetailModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 text-[#0F2745] shadow-2xl space-y-3.5 text-xs relative" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between border-b pb-2">
+        <div class="flex items-center space-x-2">
+          <span class="text-lg">👤</span>
+          <div>
+            <h3 class="font-black text-sm text-[#004B97]" id="vModalName">志工姓名</h3>
+            <span class="text-[10px] text-[#5b7290]" id="vModalStatusTag">狀態載入中...</span>
+          </div>
+        </div>
+        <button onclick="closeVolunteerDetailModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1">✕</button>
+      </div>
+
+      <div id="vModalContent" class="space-y-3">
+        <!-- 動態填入詳情內容 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 🔐 管理員登入 Modal ================= -->
+  <div id="loginModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xs w-full p-5 text-[#0F2745] shadow-2xl space-y-3.5 text-xs" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between border-b pb-2">
+        <h3 class="font-bold text-sm text-[#004B97] flex items-center">
+          🔐 管理員身分登入
+        </h3>
+        <button onclick="closeLoginModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+      </div>
+
+      <form onsubmit="handleLoginSubmit(event)" class="space-y-2.5">
+        <div>
+          <label class="block text-[#5b7290] font-bold mb-1">管理帳號</label>
+          <input type="text" id="loginUser" required autocomplete="off" class="w-full bg-[#F0F8FF] border border-blue-200 rounded-lg p-2 text-xs text-[#0F2745] focus:ring-2 focus:ring-[#004B97] focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-[#5b7290] font-bold mb-1">管理密碼</label>
+          <input type="password" id="loginPass" required autocomplete="off" class="w-full bg-[#F0F8FF] border border-blue-200 rounded-lg p-2 text-xs text-[#0F2745] focus:ring-2 focus:ring-[#004B97] focus:outline-none">
+        </div>
+        <div id="loginErrorMsg" class="hidden text-rose-600 font-bold text-[11px]">
+          帳號或密碼錯誤，請重新輸入。
+        </div>
+        <div class="pt-2 flex space-x-2">
+          <button type="submit" class="flex-1 btn-gradient font-bold py-2 rounded-lg text-xs">登入管理</button>
+          <button type="button" onclick="closeLoginModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-xs">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= ✏️ 管理員修正點位 Modal ================= -->
+  <div id="editPointModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xs w-full p-5 text-[#0F2745] shadow-2xl space-y-3 text-xs" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between border-b pb-2">
+        <h3 class="font-bold text-sm text-[#004B97]">✏️ 調整人員點位分配</h3>
+        <button onclick="closeEditPointModal()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+      </div>
+
+      <div class="space-y-2">
+        <p class="text-[#5b7290]">為 <strong id="editTargetName" class="text-[#004B97]"></strong> 重新指定點位：</p>
+        <select id="editNewPoint" class="w-full bg-[#F0F8FF] border border-blue-200 text-[#0F2745] rounded-xl p-2 font-bold focus:ring-2 focus:ring-[#004B97]">
+          <option value="P01 (港源起點)">P01 (港源起點)</option>
+          <option value="P02">P02 (前段叉路)</option>
+          <option value="P03">P03 (中段上坡)</option>
+          <option value="P04">P04 (狹窄會車處)</option>
+          <option value="P05 (越嶺高點)">P05 (越嶺高點)</option>
+          <option value="P06">P06 (下坡急彎1)</option>
+          <option value="P07">P07 (下坡急彎2)</option>
+          <option value="P08">P08 (新興聚落路口)</option>
+          <option value="P09 (水里興民宮/131線)">P09 (水里興民宮/131線)</option>
+          <option value="P10">P10 (沿線路口)</option>
+        </select>
+      </div>
+
+      <div class="pt-2 flex justify-end space-x-2">
+        <button onclick="confirmPointEdit()" class="btn-gradient font-bold px-4 py-2 rounded-lg">儲存變更</button>
+        <button onclick="closeEditPointModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg">取消</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ================= 照片全螢幕燈箱 Modal ================= -->
   <div id="lightboxModal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3" onclick="closeLightbox()">
@@ -369,20 +468,87 @@
 
     const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycby4GL3hYmIk5YGqT5ysT5Vr35ee3MkgcQSxpBqBbmTX3cDbIJ1JAXu0VSj8ZTCFIjad/exec";
 
+    // 帳密驗證 SHA-256 Hash
+    const AUTH_HASH = "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
+
     let currentLat = null;
     let currentLng = null;
     let currentAccuracy = null;
     let compressedPhotoBase64 = '';
     let onlineDataCache = [];
+    let editingUserName = null;
 
     document.addEventListener("DOMContentLoaded", () => {
+      checkAdminStatus();
       renderRoster();
       fetchOnlineRecords();
       // 每 15 秒自動輪詢雲端試算表一次，即時看見別人拍照
       setInterval(fetchOnlineRecords, 15000);
     });
 
-    // 渲染名冊 (乾淨簡約標籤)
+    // 檢查管理員身分
+    function checkAdminStatus() {
+      const isAdmin = sessionStorage.getItem("is_admin") === "true";
+      const loginBtn = document.getElementById("loginBtn");
+      const badgeGroup = document.getElementById("adminBadgeGroup");
+
+      if (isAdmin) {
+        loginBtn.classList.add("hidden");
+        badgeGroup.classList.remove("hidden");
+        badgeGroup.classList.add("flex");
+      } else {
+        loginBtn.classList.remove("hidden");
+        badgeGroup.classList.add("hidden");
+        badgeGroup.classList.remove("flex");
+      }
+    }
+
+    // 密碼 SHA-256 計算
+    async function hashString(str) {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    // 管理員登入檢查 (帳密皆為 123，不直接寫出明文)
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const u = document.getElementById("loginUser").value.trim();
+      const p = document.getElementById("loginPass").value.trim();
+
+      const uHash = await hashString(u);
+      const pHash = await hashString(p);
+
+      if (uHash === AUTH_HASH && pHash === AUTH_HASH) {
+        sessionStorage.setItem("is_admin", "true");
+        checkAdminStatus();
+        closeLoginModal();
+        alert("🛡️ 管理員已登入！您現在可以手動修正點位與調整系統設定。");
+        renderRoster();
+        renderPhotoWall(onlineDataCache);
+      } else {
+        document.getElementById("loginErrorMsg").classList.remove("hidden");
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem("is_admin");
+      checkAdminStatus();
+      renderRoster();
+      renderPhotoWall(onlineDataCache);
+      alert("已登出管理員身分。");
+    }
+
+    function openLoginModal() {
+      document.getElementById("loginUser").value = "";
+      document.getElementById("loginPass").value = "";
+      document.getElementById("loginErrorMsg").classList.add("hidden");
+      document.getElementById("loginModal").classList.remove("hidden");
+    }
+    function closeLoginModal() {
+      document.getElementById("loginModal").classList.add("hidden");
+    }
+
+    // 渲染名冊 (支援點擊彈出個人照片與定位詳情)
     function renderRoster() {
       const container = document.getElementById("rosterList");
       container.innerHTML = "";
@@ -390,34 +556,182 @@
       let checkedInCount = 0;
 
       ROSTER_NAMES.forEach(name => {
-        // 比對是否已打卡
-        const userRecord = onlineDataCache.find(r => r.userName && r.userName.includes(name));
+        // 比對最新打卡紀錄
+        const userRecord = onlineDataCache.slice().reverse().find(r => r.userName && r.userName.includes(name));
         const isChecked = !!userRecord;
         if (isChecked) checkedInCount++;
 
         const item = document.createElement("div");
-        item.className = `p-2.5 rounded-xl border flex items-center justify-between transition-all ${
+        item.onclick = () => openVolunteerDetail(name);
+        item.className = `p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all active:scale-95 hover:shadow-md ${
           isChecked 
-            ? 'bg-emerald-50/70 border-emerald-300 shadow-sm' 
-            : 'bg-[#F0F8FF]/80 border-blue-100 text-slate-600'
+            ? 'bg-emerald-50/80 border-emerald-300 shadow-xs' 
+            : 'bg-[#F0F8FF]/80 border-blue-100 hover:border-blue-300 text-slate-600'
         }`;
 
+        const pointDisplay = isChecked 
+          ? (userRecord.pointId ? userRecord.pointId.split(' ')[0] : '已到崗') 
+          : '未就位';
+
+        const hasPhoto = isChecked && userRecord.photoUrl && userRecord.photoUrl.indexOf("http") !== -1;
+
         item.innerHTML = `
-          <div class="font-bold text-xs ${isChecked ? 'text-emerald-900' : 'text-[#0F2745]'}">
-            ${name}
+          <div class="flex items-center space-x-1.5">
+            <span class="font-bold text-xs ${isChecked ? 'text-emerald-950 font-black' : 'text-[#0F2745]'}">
+              ${name}
+            </span>
+            ${hasPhoto ? '<span class="text-[10px]" title="已傳照片">📷</span>' : ''}
           </div>
-          <span class="text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+          <span class="text-[10px] px-1.5 py-0.5 rounded-full font-bold flex items-center ${
             isChecked 
               ? 'bg-emerald-600 text-white' 
-              : 'bg-slate-200/80 text-slate-500'
+              : 'bg-slate-200/90 text-slate-500'
           }">
-            ${isChecked ? (userRecord.pointId ? userRecord.pointId.split(' ')[0] : '已到崗') : '未就位'}
+            ${isChecked ? '🟢 ' + pointDisplay : '未就位'}
           </span>
         `;
         container.appendChild(item);
       });
 
       document.getElementById("rosterStatusCount").textContent = `就位進度：${checkedInCount} / ${ROSTER_NAMES.length} 員`;
+    }
+
+    // 點擊名冊打開志工照片與定位卡片
+    function openVolunteerDetail(name) {
+      const userRecord = onlineDataCache.slice().reverse().find(r => r.userName && r.userName.includes(name));
+      const modal = document.getElementById("volunteerDetailModal");
+      const nameElem = document.getElementById("vModalName");
+      const tagElem = document.getElementById("vModalStatusTag");
+      const content = document.getElementById("vModalContent");
+      const isAdmin = sessionStorage.getItem("is_admin") === "true";
+
+      nameElem.textContent = name;
+
+      if (!userRecord) {
+        tagElem.textContent = "⏳ 尚未打卡就位";
+        tagElem.className = "text-[10px] text-amber-600 font-bold";
+        content.innerHTML = `
+          <div class="text-center py-6 bg-slate-50 rounded-xl p-4 border border-dashed border-slate-300">
+            <div class="text-3xl mb-1.5">⏳</div>
+            <p class="font-bold text-[#0F2745] mb-1">【${name}】尚未打卡</p>
+            <p class="text-[#5b7290] text-[11px] leading-relaxed">
+              出發前往路口後，請提醒其抵達站點時使用手機打卡並回傳現場路口照片。
+            </p>
+          </div>
+        `;
+      } else {
+        tagElem.textContent = `🟢 已就位 · ${userRecord.pointId || '指定點位'}`;
+        tagElem.className = "text-[10px] text-emerald-700 font-bold";
+
+        // 轉換 Google Drive 照片直連
+        let directImgUrl = null;
+        if (userRecord.photoUrl && userRecord.photoUrl.indexOf("http") !== -1) {
+          const driveMatch = userRecord.photoUrl.match(/(?:\/d\/|id=)([a-zA-Z0-9_-]{25,})/);
+          if (driveMatch && driveMatch[1]) {
+            directImgUrl = `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
+          }
+        }
+
+        const mapHref = userRecord.mapLink || (userRecord.lat ? `https://www.google.com/maps?q=${userRecord.lat},${userRecord.lng}` : null);
+
+        let displayTime = userRecord.time || '';
+        if (displayTime.includes("T")) {
+          const d = new Date(displayTime);
+          displayTime = `${(d.getHours()+8)%24 < 10 ? '0' : ''}${(d.getHours()+8)%24}:${d.getMinutes() < 10 ? '0' : ''}${d.getMinutes()}`;
+        }
+
+        content.innerHTML = `
+          <div class="bg-[#F0F8FF] p-3 rounded-xl border border-blue-200/80 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[#5b7290]">分配站點：</span>
+              <span class="font-bold text-[#004B97]">${userRecord.pointId || '未註明'}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-[#5b7290]">打卡時間：</span>
+              <span class="font-mono text-slate-700 font-bold">${displayTime}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-[#5b7290]">GPS 座標：</span>
+              <span class="font-mono text-slate-700 text-[11px]">${userRecord.lat ? `${userRecord.lat}, ${userRecord.lng} (${userRecord.accuracy || ''})` : '未擷取'}</span>
+            </div>
+            ${userRecord.note ? `
+              <div class="pt-1 border-t border-blue-200/60 text-[#0F2745]">
+                💬 <strong>備註：</strong> ${userRecord.note}
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- 照片大圖預覽 -->
+          ${directImgUrl ? `
+            <div class="space-y-1">
+              <div class="flex items-center justify-between text-[#5b7290] text-[11px]">
+                <span>📸 現場照片：</span>
+                <span class="text-[10px] text-blue-600 font-bold">點擊放大檢視</span>
+              </div>
+              <img src="${directImgUrl}" 
+                   onclick="openLightbox('${directImgUrl}', '${name} - ${userRecord.pointId}')"
+                   class="w-full max-h-56 object-cover rounded-xl border border-blue-200 shadow-sm cursor-pointer hover:opacity-95 transition" 
+                   alt="現場照片"
+                   onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=${userRecord.photoUrl.match(/(?:\/d\/|id=)([a-zA-Z0-9_-]{25,})/)?.[1]}&sz=w800'">
+            </div>
+          ` : `
+            <div class="text-center py-4 bg-slate-50 text-slate-400 rounded-xl text-[11px]">
+              (該員此筆打卡未上傳照片)
+            </div>
+          `}
+
+          <!-- 操作按鈕 -->
+          <div class="pt-1 flex items-center space-x-2">
+            ${mapHref ? `
+              <a href="${mapHref}" target="_blank" class="flex-1 btn-gradient font-bold py-2 rounded-xl text-center flex items-center justify-center active:scale-95 transition">
+                🗺️ 在 Google Maps 查看位置
+              </a>
+            ` : ''}
+            ${isAdmin ? `
+              <button onclick="openEditPointModal('${name}', '${userRecord.pointId || ''}')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-bold px-3 py-2 rounded-xl transition">
+                ✏️ 調整點位
+              </button>
+            ` : ''}
+          </div>
+        `;
+      }
+
+      modal.classList.remove("hidden");
+    }
+
+    function closeVolunteerDetailModal() {
+      document.getElementById("volunteerDetailModal").classList.add("hidden");
+    }
+
+    // 管理員調整點位
+    function openEditPointModal(userName, currentPoint) {
+      editingUserName = userName;
+      document.getElementById("editTargetName").textContent = userName;
+      if (currentPoint) {
+        document.getElementById("editNewPoint").value = currentPoint;
+      }
+      document.getElementById("editPointModal").classList.remove("hidden");
+    }
+    function closeEditPointModal() {
+      document.getElementById("editPointModal").classList.add("hidden");
+    }
+
+    function confirmPointEdit() {
+      const newPt = document.getElementById("editNewPoint").value;
+      if (!editingUserName) return;
+
+      // 修正本地與快取
+      onlineDataCache.forEach(r => {
+        if (r.userName === editingUserName) {
+          r.pointId = newPt;
+        }
+      });
+
+      renderRoster();
+      renderPhotoWall(onlineDataCache);
+      closeEditPointModal();
+      openVolunteerDetail(editingUserName); // 刷新詳情
+      alert(`已成功將【${editingUserName}】的點位修正為：${newPt}`);
     }
 
     // 取得手機 GPS 經緯度
@@ -592,7 +906,6 @@
           onlineDataCache = resJson.data;
           renderPhotoWall(onlineDataCache);
           renderRoster(); // 同步更新名冊就位狀態
-          document.getElementById("syncBadge").classList.remove("hidden");
         }
       } catch (e) {
         console.log("讀取線上統計失敗:", e);
@@ -603,6 +916,7 @@
     function renderPhotoWall(records) {
       const container = document.getElementById("checkInRecordList");
       const badge = document.getElementById("checkedInCountBadge");
+      const isAdmin = sessionStorage.getItem("is_admin") === "true";
 
       if (!records || records.length === 0) {
         container.innerHTML = `<div class="text-center py-8 text-[#5b7290] text-xs">目前尚無人打卡回報。被放點後請在上方進行打卡！</div>`;
@@ -616,7 +930,7 @@
       // 依時間倒序排列（最新的在最上面）
       const reversed = [...records].reverse();
 
-      reversed.forEach(r => {
+      reversed.forEach((r, idx) => {
         const card = document.createElement("div");
         card.className = "p-3.5 rounded-2xl bg-white border border-blue-100 shadow-sm space-y-2";
 
@@ -633,8 +947,8 @@
         }
 
         // 時間格式化
-        let displayTime = r.time;
-        if (displayTime && displayTime.includes("T")) {
+        let displayTime = r.time || '';
+        if (displayTime.includes("T")) {
           const d = new Date(displayTime);
           displayTime = `${(d.getHours()+8)%24 < 10 ? '0' : ''}${(d.getHours()+8)%24}:${d.getMinutes() < 10 ? '0' : ''}${d.getMinutes()}`;
         }
@@ -650,8 +964,13 @@
                 🟢 已到崗
               </span>
             </div>
-            <div class="text-[11px] text-[#5b7290] font-mono">
-              ${displayTime || ''}
+            <div class="flex items-center space-x-2 text-[11px] text-[#5b7290]">
+              <span class="font-mono">${displayTime}</span>
+              ${isAdmin ? `
+                <button onclick="adminDeleteRecord(${records.length - 1 - idx})" class="text-rose-500 hover:text-rose-700 font-bold text-xs" title="管理員刪除此筆">
+                  ✕
+                </button>
+              ` : ''}
             </div>
           </div>
 
@@ -688,6 +1007,14 @@
 
         container.appendChild(card);
       });
+    }
+
+    // 管理員移除誤按的記錄
+    function adminDeleteRecord(index) {
+      if (!confirm("確定要從即時看板移除這筆記錄嗎？")) return;
+      onlineDataCache.splice(index, 1);
+      renderPhotoWall(onlineDataCache);
+      renderRoster();
     }
 
     // 燈箱大圖
