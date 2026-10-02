@@ -355,12 +355,18 @@
       { name: "劉雯伶", role: "147線機動巡邏", phone: "0900-333-444" }
     ];
 
+    const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycby4GL3hYmIk5YGqT5ysT5Vr35ee3MkgcQSxpBqBbmTX3cDbIJ1JAXu0VSj8ZTCFIjad/exec";
+
     let currentLat = null;
     let currentLng = null;
     let currentAccuracy = null;
     let compressedPhotoBase64 = '';
 
     document.addEventListener("DOMContentLoaded", () => {
+      // 若尚未設定，自動寫入預設後端 URL
+      if (!localStorage.getItem("gas_web_app_url")) {
+        localStorage.setItem("gas_web_app_url", DEFAULT_GAS_URL);
+      }
       renderRoster();
       loadStoredRecords();
       fetchOnlineRecords();
@@ -538,7 +544,7 @@
         timestamp: new Date().toISOString()
       };
 
-      const gasUrl = localStorage.getItem("gas_web_app_url");
+      const gasUrl = localStorage.getItem("gas_web_app_url") || DEFAULT_GAS_URL;
 
       try {
         if (gasUrl) {
@@ -603,7 +609,7 @@
 
     // 從 Google Apps Script 讀取線上打卡統計
     async function fetchOnlineRecords() {
-      const gasUrl = localStorage.getItem("gas_web_app_url");
+      const gasUrl = localStorage.getItem("gas_web_app_url") || DEFAULT_GAS_URL;
       if (!gasUrl) return;
 
       try {
