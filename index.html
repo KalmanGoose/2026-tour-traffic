@@ -257,6 +257,26 @@
       </div>
     </section>
 
+    <!-- ================= 📍 147 縣道 10 大站點即時部署與管制指引 (P01~P10) ================= -->
+    <section class="card-base p-4">
+      <div class="flex items-center justify-between mb-3 border-b border-blue-100 pb-2">
+        <div>
+          <h3 class="text-xs font-black text-[#004B97] flex items-center">
+            <span class="text-base mr-1.5">📍</span>
+            147 縣道 10 大站點部署表 (P01 ~ P10)
+          </h3>
+          <p class="text-[10px] text-[#5b7290]">即時掌握每個路口管制重點、分配志工與就位狀況</p>
+        </div>
+        <button onclick="openManagePointsModal()" class="text-[11px] bg-blue-100 hover:bg-blue-200 text-[#004B97] border border-blue-300 font-bold px-2.5 py-1 rounded-lg flex items-center transition shadow-xs">
+          ✏️ 編輯站點名稱
+        </button>
+      </div>
+
+      <div class="space-y-2.5" id="stationsBoardList">
+        <!-- 動態由 JS 渲染 10 個站點卡片 -->
+      </div>
+    </section>
+
     <!-- ================= 👥 交管人員出勤名冊 (點擊卡片直接查看該員照片與定位！) ================= -->
     <section class="card-base p-4">
       <div class="flex items-center justify-between mb-3 border-b border-blue-100 pb-2">
@@ -725,17 +745,69 @@
       { id: "P10", label: "水里備援路口", note: "水里端沿線機動備援點位" }
     ];
 
+    // 安全存取 LocalStorage
+    const memoryStore = {};
+    function safeGetItem(key) {
+      try {
+        return localStorage.getItem(key);
+      } catch(e) {
+        return memoryStore[key] || null;
+      }
+    }
+    function safeSetItem(key, val) {
+      try {
+        localStorage.setItem(key, val);
+      } catch(e) {
+        memoryStore[key] = val;
+      }
+    }
+
     function getPointsConfig() {
-      const saved = localStorage.getItem("points_config");
+      const saved = safeGetItem("points_config");
       if (saved) {
-        try { return JSON.parse(saved); } catch(e) {}
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch(e) {}
       }
       return DEFAULT_POINTS_CONFIG;
     }
 
+    // 取得點位完整資訊 (根據 ID 如 "P01" 或原始字串)
+    function getPointInfo(rawPt) {
+      if (!rawPt) return { id: '', label: '未指定', note: '' };
+      const rawId = rawPt.split(' ')[0].toUpperCase();
+      const config = getPointsConfig();
+      const found = config.find(p => p.id.toUpperCase() === rawId);
+      if (found) return found;
+      return { id: rawId, label: rawPt, note: '' };
+    }
+
+    // 管理員手動指派記錄 (避免被 15 秒 polling 覆蓋)
+    function getAdminAssignments() {
+      const saved = safeGetItem("admin_assigned_points");
+      if (saved) {
+        try { return JSON.parse(saved); } catch(e) {}
+      }
+      return {};
+    }
+
+    function setAdminAssignment(userName, pointId) {
+      const assignments = getAdminAssignments();
+      if (pointId) {
+        assignments[userName] = pointId;
+      } else {
+        delete assignments[userName];
+      }
+      safeSetItem("admin_assigned_points", JSON.stringify(assignments));
+    }
+
     function savePointsConfig(config) {
-      localStorage.setItem("points_config", JSON.stringify(config));
+      safeSetItem("points_config", JSON.stringify(config));
       renderPointDropdowns();
+      renderStationsBoard();
+      renderRoster();
+      renderPhotoWall(onlineDataCache);
     }
 
     function renderPointDropdowns() {
@@ -745,6 +817,7 @@
 
       if (select1) {
         const curVal = select1.value;
+        const curId = curVal ? curVal.split(' ')[0].toUpperCase() : '';
         select1.innerHTML = "";
         config.forEach(pt => {
           const opt = document.createElement("option");
@@ -752,11 +825,19 @@
           opt.textContent = `${pt.id} (${pt.label})`;
           select1.appendChild(opt);
         });
-        if (curVal) select1.value = curVal;
+        if (curId) {
+          for (let i = 0; i < select1.options.length; i++) {
+            if (select1.options[i].value.startsWith(curId)) {
+              select1.selectedIndex = i;
+              break;
+            }
+          }
+        }
       }
 
       if (select2) {
         const curVal2 = select2.value;
+        const curId2 = curVal2 ? curVal2.split(' ')[0].toUpperCase() : '';
         select2.innerHTML = "";
         config.forEach(pt => {
           const opt = document.createElement("option");
@@ -764,8 +845,121 @@
           opt.textContent = `${pt.id} (${pt.label})`;
           select2.appendChild(opt);
         });
-        if (curVal2) select2.value = curVal2;
+        if (curId2) {
+          for (let i = 0; i < select2.options.length; i++) {
+            if (select2.options[i].value.startsWith(curId2)) {
+              select2.selectedIndex = i;
+              break;
+            }
+          }
+        }
       }
+    }
+
+    // 渲染 147 縣道 10 大站點即時配置看板
+    function renderStationsBoard() {
+      const container = document.getElementById("stationsBoardList");
+      if (!container) return;
+      const config = getPointsConfig();
+      const adminAssignments = getAdminAssignments();
+      const isAdmin = sessionStorage.getItem("is_admin") === "true";
+
+      container.innerHTML = "";
+
+      config.forEach((pt, index) => {
+        // 尋找分配在此點的人員
+        const assignedVolunteers = [];
+        ROSTER_NAMES.forEach(name => {
+          const record = onlineDataCache.slice().reverse().find(r => r.userName && r.userName.includes(name));
+          const adminPt = adminAssignments[name];
+          const checkInPt = record && record.pointId ? record.pointId.split(' ')[0].toUpperCase() : null;
+
+          if (checkInPt === pt.id.toUpperCase()) {
+            assignedVolunteers.push({ name, status: 'checked_in', time: record.time, record });
+          } else if (adminPt === pt.id.toUpperCase() && !checkInPt) {
+            assignedVolunteers.push({ name, status: 'assigned_pending', time: null, record: null });
+          }
+        });
+
+        const card = document.createElement("div");
+        card.className = "p-3 rounded-xl border border-blue-100/90 bg-white hover:border-blue-300 transition shadow-xs space-y-2";
+
+        let personnelHtml = '';
+        if (assignedVolunteers.length > 0) {
+          personnelHtml = assignedVolunteers.map(v => {
+            if (v.status === 'checked_in') {
+              return `
+                <button type="button" onclick="openVolunteerDetail('${v.name}')" class="inline-flex items-center space-x-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-[11px] font-bold px-2 py-0.5 rounded-full cursor-pointer transition">
+                  <span>🟢 ${v.name}</span>
+                  <span class="text-[9px] bg-emerald-600 text-white px-1 rounded">已到崗</span>
+                </button>
+              `;
+            } else {
+              return `
+                <button type="button" onclick="openVolunteerDetail('${v.name}')" class="inline-flex items-center space-x-1 bg-amber-100 hover:bg-amber-200 text-amber-800 text-[11px] font-bold px-2 py-0.5 rounded-full cursor-pointer transition">
+                  <span>⏳ ${v.name}</span>
+                  <span class="text-[9px] bg-amber-600 text-white px-1 rounded">待就位</span>
+                </button>
+              `;
+            }
+          }).join(' ');
+        } else {
+          personnelHtml = `<span class="text-[11px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">⚪ 尚未指派人員</span>`;
+        }
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="bg-[#004B97] text-white text-xs font-black px-2 py-0.5 rounded-md">
+                ${pt.id}
+              </span>
+              <span class="font-black text-xs text-[#0F2745]">${pt.label}</span>
+            </div>
+            <div class="flex items-center space-x-1.5 flex-wrap justify-end gap-1">
+              ${personnelHtml}
+            </div>
+          </div>
+
+          <div class="text-[11px] text-[#5b7290] bg-[#F0F8FF] p-2.5 rounded-lg leading-relaxed border border-blue-100/60">
+            <div class="font-bold text-[#004B97] text-[10px] mb-0.5">📌 管制重點與注意事項：</div>
+            <div>${pt.note || '大會規劃路口交管點位，請提醒參賽選手靠右並留意橫向車輛。'}</div>
+          </div>
+
+          <div class="flex items-center justify-between pt-0.5 text-[11px]">
+            <span class="text-[10px] text-slate-400">第 ${index + 1} 號管制站</span>
+            <div class="flex items-center space-x-2">
+              ${isAdmin ? `
+                <button type="button" onclick="openQuickAssignModal('${pt.id}')" class="text-emerald-700 hover:text-emerald-900 font-bold flex items-center">
+                  👤 指派志工
+                </button>
+              ` : ''}
+              <button type="button" onclick="openManagePointsModal('${pt.id}')" class="text-[#004B97] hover:text-[#002e5d] font-bold flex items-center">
+                ✏️ 修改名稱與註解
+              </button>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // 快捷指派志工至指定站點
+    function openQuickAssignModal(pointId) {
+      const config = getPointsConfig();
+      const pt = config.find(p => p.id === pointId) || { id: pointId, label: '' };
+      const chosen = prompt(`請輸入要指派到【${pt.id} (${pt.label})】的志工姓名：\n\n可選名單：\n${ROSTER_NAMES.join('、')}`);
+      if (!chosen) return;
+      const matched = ROSTER_NAMES.find(n => n.includes(chosen.trim()) || chosen.trim().includes(n));
+      if (!matched) {
+        alert("找不到此志工姓名，請重新輸入。");
+        return;
+      }
+      setAdminAssignment(matched, pt.id);
+      renderStationsBoard();
+      renderRoster();
+      renderPhotoWall(onlineDataCache);
+      alert(`✅ 已成功將【${matched}】指派至：${pt.id} (${pt.label})`);
     }
 
     function openManagePointsModal(targetPtId) {
@@ -820,13 +1014,17 @@
       config.forEach((pt, index) => {
         const lbl = document.getElementById(`pt-label-${index}`);
         const nte = document.getElementById(`pt-note-${index}`);
-        if (lbl) pt.label = lbl.value.trim() || pt.label;
-        if (nte) pt.note = nte.value.trim();
+        if (lbl && lbl.value.trim()) {
+          pt.label = lbl.value.trim();
+        }
+        if (nte) {
+          pt.note = nte.value.trim();
+        }
       });
 
       savePointsConfig(config);
       closeManagePointsModal();
-      alert("✅ P1 ~ P10 站點名稱與註解已成功儲存！所有選單已同步更新。");
+      alert("✅ P1 ~ P10 站點名稱與註解已成功儲存！所有選單、站點看板與名冊已即時更新。");
     }
 
     function resetPointsConfig() {
@@ -846,6 +1044,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       checkAdminStatus();
       renderPointDropdowns();
+      renderStationsBoard();
       renderRoster();
       fetchOnlineRecords();
       // 每 15 秒自動輪詢雲端試算表一次，即時看見別人拍照
@@ -888,7 +1087,8 @@
         sessionStorage.setItem("is_admin", "true");
         checkAdminStatus();
         closeLoginModal();
-        alert("🛡️ 管理員已登入！您現在可以手動修正點位與調整系統設定。");
+        alert("🛡️ 管理員已登入！您現在可以自訂點位名稱、指派人員與調整系統設定。");
+        renderStationsBoard();
         renderRoster();
         renderPhotoWall(onlineDataCache);
       } else {
@@ -899,6 +1099,7 @@
     function handleLogout() {
       sessionStorage.removeItem("is_admin");
       checkAdminStatus();
+      renderStationsBoard();
       renderRoster();
       renderPhotoWall(onlineDataCache);
       alert("已登出管理員身分。");
@@ -919,6 +1120,7 @@
       const container = document.getElementById("rosterList");
       container.innerHTML = "";
 
+      const adminAssignments = getAdminAssignments();
       let checkedInCount = 0;
 
       ROSTER_NAMES.forEach(name => {
@@ -927,34 +1129,44 @@
         const isChecked = !!userRecord;
         if (isChecked) checkedInCount++;
 
+        // 找出該志工的點位 (優先以打卡為準，若未打卡則以管理員指派為準)
+        const rawPt = (userRecord && userRecord.pointId) || adminAssignments[name] || '';
+        const ptInfo = getPointInfo(rawPt);
+
         const item = document.createElement("div");
         item.onclick = () => openVolunteerDetail(name);
-        item.className = `p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all active:scale-95 hover:shadow-md ${
+        item.className = `p-2.5 rounded-xl border flex flex-col justify-between cursor-pointer transition-all active:scale-95 hover:shadow-md ${
           isChecked 
             ? 'bg-emerald-50/80 border-emerald-300 shadow-xs' 
-            : 'bg-[#F0F8FF]/80 border-blue-100 hover:border-blue-300 text-slate-600'
+            : (ptInfo.id ? 'bg-amber-50/70 border-amber-200 hover:border-amber-300' : 'bg-[#F0F8FF]/80 border-blue-100 hover:border-blue-300')
         }`;
-
-        const pointDisplay = isChecked 
-          ? (userRecord.pointId ? userRecord.pointId.split(' ')[0] : '已到崗') 
-          : '未就位';
 
         const hasPhoto = isChecked && userRecord.photoUrl && userRecord.photoUrl.indexOf("http") !== -1;
 
+        let badgeHtml = '';
+        if (isChecked) {
+          badgeHtml = `<span class="text-[10px] px-1.5 py-0.5 rounded-full font-bold bg-emerald-600 text-white">🟢 ${ptInfo.id || '已到崗'}</span>`;
+        } else if (ptInfo.id) {
+          badgeHtml = `<span class="text-[10px] px-1.5 py-0.5 rounded-full font-bold bg-amber-500 text-white">⏳ ${ptInfo.id} 待就位</span>`;
+        } else {
+          badgeHtml = `<span class="text-[10px] px-1.5 py-0.5 rounded-full font-bold bg-slate-200/90 text-slate-500">⚪ 待指派</span>`;
+        }
+
+        const stationLabel = ptInfo.id ? `${ptInfo.id} ${ptInfo.label}` : '尚未分配站點';
+
         item.innerHTML = `
-          <div class="flex items-center space-x-1.5">
-            <span class="font-bold text-xs ${isChecked ? 'text-emerald-950 font-black' : 'text-[#0F2745]'}">
-              ${name}
-            </span>
-            ${hasPhoto ? '<span class="text-[10px]" title="已傳照片">📷</span>' : ''}
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center space-x-1.5">
+              <span class="font-bold text-xs ${isChecked ? 'text-emerald-950 font-black' : 'text-[#0F2745]'}">
+                ${name}
+              </span>
+              ${hasPhoto ? '<span class="text-[10px]" title="已傳照片">📷</span>' : ''}
+            </div>
+            ${badgeHtml}
           </div>
-          <span class="text-[10px] px-1.5 py-0.5 rounded-full font-bold flex items-center ${
-            isChecked 
-              ? 'bg-emerald-600 text-white' 
-              : 'bg-slate-200/90 text-slate-500'
-          }">
-            ${isChecked ? '🟢 ' + pointDisplay : '未就位'}
-          </span>
+          <div class="text-[10px] text-[#5b7290] truncate font-medium">
+            ${stationLabel}
+          </div>
         `;
         container.appendChild(item);
       });
@@ -970,26 +1182,56 @@
       const tagElem = document.getElementById("vModalStatusTag");
       const content = document.getElementById("vModalContent");
       const isAdmin = sessionStorage.getItem("is_admin") === "true";
+      const adminAssignments = getAdminAssignments();
 
       nameElem.textContent = name;
 
-      if (!userRecord) {
-        tagElem.textContent = "⏳ 尚未打卡就位";
+      const rawPt = (userRecord && userRecord.pointId) || adminAssignments[name] || '';
+      const ptInfo = getPointInfo(rawPt);
+      const isChecked = !!userRecord;
+
+      if (!isChecked) {
+        tagElem.textContent = ptInfo.id ? `⏳ 待就位 · ${ptInfo.id} (${ptInfo.label})` : "⏳ 尚未打卡就位";
         tagElem.className = "text-[10px] text-amber-600 font-bold";
         content.innerHTML = `
-          <div class="text-center py-6 bg-slate-50 rounded-xl p-4 border border-dashed border-slate-300">
-            <div class="text-3xl mb-1.5">⏳</div>
-            <p class="font-bold text-[#0F2745] mb-1">【${name}】尚未打卡</p>
+          <div class="bg-[#F0F8FF] p-3 rounded-xl border border-blue-200/80 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[#5b7290]">指定站點：</span>
+              <span class="font-bold text-[#004B97]">${ptInfo.id ? `${ptInfo.id} (${ptInfo.label})` : '尚未指定 (邊騎邊放)'}</span>
+            </div>
+            ${ptInfo.note ? `
+              <div class="pt-1.5 border-t border-blue-200/60 text-[#0F2745] bg-amber-50/70 p-2 rounded-lg border border-amber-200/80 text-xs">
+                📌 <strong>${ptInfo.id} 站點管制註解：</strong> ${ptInfo.note}
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="text-center py-4 bg-slate-50 rounded-xl p-3 border border-dashed border-slate-300">
+            <div class="text-2xl mb-1">⏳</div>
+            <p class="font-bold text-[#0F2745] mb-0.5">【${name}】尚未打卡</p>
             <p class="text-[#5b7290] text-[11px] leading-relaxed">
-              出發前往路口後，請提醒其抵達站點時使用手機打卡並回傳現場路口照片。
+              抵達站點時，請提醒該志工在路口拍照並點擊「📍 抓取目前 GPS」送出打卡。
             </p>
+          </div>
+
+          <div class="pt-1 flex flex-wrap items-center gap-1.5">
+            ${isAdmin ? `
+              <button onclick="openEditPointModal('${name}', '${ptInfo.id ? `${ptInfo.id} (${ptInfo.label})` : ''}')" class="flex-1 bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-bold py-2 rounded-xl text-center transition">
+                ✏️ 指派 / 變更點位
+              </button>
+              ${ptInfo.id ? `
+                <button onclick="closeVolunteerDetailModal(); openManagePointsModal('${ptInfo.id}');" class="bg-blue-100 hover:bg-blue-200 text-[#004B97] border border-blue-300 font-bold px-3 py-2 rounded-xl transition">
+                  📍 編輯此點註解
+                </button>
+              ` : ''}
+            ` : ''}
           </div>
         `;
       } else {
-        tagElem.textContent = `🟢 已就位 · ${userRecord.pointId || '指定點位'}`;
+        // user has checked in
+        tagElem.textContent = `🟢 已就位 · ${ptInfo.id} (${ptInfo.label})`;
         tagElem.className = "text-[10px] text-emerald-700 font-bold";
 
-        // 轉換 Google Drive 照片直連
         let directImgUrl = null;
         if (userRecord.photoUrl && userRecord.photoUrl.indexOf("http") !== -1) {
           const driveMatch = userRecord.photoUrl.match(/(?:\/d\/|id=)([a-zA-Z0-9_-]{25,})/);
@@ -1006,14 +1248,11 @@
           displayTime = `${(d.getHours()+8)%24 < 10 ? '0' : ''}${(d.getHours()+8)%24}:${d.getMinutes() < 10 ? '0' : ''}${d.getMinutes()}`;
         }
 
-        const ptId = (userRecord.pointId || '').split(' ')[0];
-        const ptConf = getPointsConfig().find(p => p.id === ptId);
-
         content.innerHTML = `
           <div class="bg-[#F0F8FF] p-3 rounded-xl border border-blue-200/80 space-y-1.5">
             <div class="flex items-center justify-between">
               <span class="text-[#5b7290]">分配站點：</span>
-              <span class="font-bold text-[#004B97]">${userRecord.pointId || '未註明'}</span>
+              <span class="font-bold text-[#004B97]">${ptInfo.id} (${ptInfo.label})</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-[#5b7290]">打卡時間：</span>
@@ -1028,9 +1267,9 @@
                 💬 <strong>志工回報備註：</strong> ${userRecord.note}
               </div>
             ` : ''}
-            ${ptConf && ptConf.note ? `
+            ${ptInfo.note ? `
               <div class="pt-1.5 border-t border-blue-200/60 text-[#0F2745] bg-amber-50/70 p-2 rounded-lg border border-amber-200/80">
-                📌 <strong>${ptConf.id} 站點管制註解：</strong> ${ptConf.note}
+                📌 <strong>${ptInfo.id} 站點管制註解：</strong> ${ptInfo.note}
               </div>
             ` : ''}
           </div>
@@ -1043,7 +1282,7 @@
                 <span class="text-[10px] text-blue-600 font-bold">點擊放大檢視</span>
               </div>
               <img src="${directImgUrl}" 
-                   onclick="openLightbox('${directImgUrl}', '${name} - ${userRecord.pointId}')"
+                   onclick="openLightbox('${directImgUrl}', '${name} - ${ptInfo.id} (${ptInfo.label})')"
                    class="w-full max-h-56 object-cover rounded-xl border border-blue-200 shadow-sm cursor-pointer hover:opacity-95 transition" 
                    alt="現場照片" 
                    onerror="this.onerror=null; this.src='https://drive.google.com/thumbnail?id=${userRecord.photoUrl.match(/(?:\/d\/|id=)([a-zA-Z0-9_-]{25,})/)?.[1]}&sz=w800'">
@@ -1062,12 +1301,14 @@
               </a>
             ` : ''}
             ${isAdmin ? `
-              <button onclick="openEditPointModal('${name}', '${userRecord.pointId || ''}')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-bold px-3 py-2 rounded-xl transition">
+              <button onclick="openEditPointModal('${name}', '${ptInfo.id ? `${ptInfo.id} (${ptInfo.label})` : ''}')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-bold px-3 py-2 rounded-xl transition">
                 ✏️ 調整點位
               </button>
-              <button onclick="closeVolunteerDetailModal(); openManagePointsModal('${ptId}');" class="bg-blue-100 hover:bg-blue-200 text-[#004B97] border border-blue-300 font-bold px-3 py-2 rounded-xl transition">
-                📍 編輯此點註解
-              </button>
+              ${ptInfo.id ? `
+                <button onclick="closeVolunteerDetailModal(); openManagePointsModal('${ptInfo.id}');" class="bg-blue-100 hover:bg-blue-200 text-[#004B97] border border-blue-300 font-bold px-3 py-2 rounded-xl transition">
+                  📍 編輯此點註解
+                </button>
+              ` : ''}
             ` : ''}
           </div>
         `;
@@ -1084,8 +1325,15 @@
     function openEditPointModal(userName, currentPoint) {
       editingUserName = userName;
       document.getElementById("editTargetName").textContent = userName;
+      const select = document.getElementById("editNewPoint");
       if (currentPoint) {
-        document.getElementById("editNewPoint").value = currentPoint;
+        const curId = currentPoint.split(' ')[0].toUpperCase();
+        for (let i = 0; i < select.options.length; i++) {
+          if (select.options[i].value.startsWith(curId)) {
+            select.selectedIndex = i;
+            break;
+          }
+        }
       }
       document.getElementById("editPointModal").classList.remove("hidden");
     }
@@ -1094,21 +1342,27 @@
     }
 
     function confirmPointEdit() {
-      const newPt = document.getElementById("editNewPoint").value;
+      const select = document.getElementById("editNewPoint");
+      const newPtFull = select.value;
       if (!editingUserName) return;
+      const newPtId = newPtFull.split(' ')[0].toUpperCase();
 
-      // 修正本地與快取
+      // 1. 存入本地管理員指派 (不會被每 15 秒的 polling 覆蓋)
+      setAdminAssignment(editingUserName, newPtId);
+
+      // 2. 若快取中已有該員打卡，同步更新顯示的 pointId
       onlineDataCache.forEach(r => {
-        if (r.userName === editingUserName) {
-          r.pointId = newPt;
+        if (r.userName && r.userName.includes(editingUserName)) {
+          r.pointId = newPtFull;
         }
       });
 
+      renderStationsBoard();
       renderRoster();
       renderPhotoWall(onlineDataCache);
       closeEditPointModal();
       openVolunteerDetail(editingUserName); // 刷新詳情
-      alert(`已成功將【${editingUserName}】的點位修正為：${newPt}`);
+      alert(`✅ 已成功將【${editingUserName}】指派至：${newPtFull}`);
     }
 
     // 取得手機 GPS 經緯度
@@ -1273,7 +1527,7 @@
 
     // 從 Google Apps Script 讀取線上所有人的打卡與照片
     async function fetchOnlineRecords() {
-      const gasUrl = localStorage.getItem("gas_web_app_url") || DEFAULT_GAS_URL;
+      const gasUrl = safeGetItem("gas_web_app_url") || DEFAULT_GAS_URL;
       if (!gasUrl) return;
 
       try {
@@ -1281,6 +1535,7 @@
         const resJson = await res.json();
         if (resJson.status === "success" && Array.isArray(resJson.data)) {
           onlineDataCache = resJson.data;
+          renderStationsBoard(); // 同步更新 10 大站點看板
           renderPhotoWall(onlineDataCache);
           renderRoster(); // 同步更新名冊就位狀態
         }
@@ -1312,6 +1567,8 @@
         card.className = "p-3.5 rounded-2xl bg-white border border-blue-100 shadow-sm space-y-2";
 
         const mapHref = r.mapLink || (r.lat ? `https://www.google.com/maps?q=${r.lat},${r.lng}` : null);
+        const ptInfo = getPointInfo(r.pointId);
+        const displayPoint = ptInfo.id ? `${ptInfo.id} (${ptInfo.label})` : (r.pointId || '點位');
 
         // 轉換 Google Drive 連結為可直接在網頁顯示的圖片 URL
         let directImgUrl = null;
@@ -1334,7 +1591,7 @@
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-2">
               <span class="bg-[#004B97] text-white text-[11px] font-black px-2 py-0.5 rounded-md">
-                ${r.pointId || '點位'}
+                ${displayPoint}
               </span>
               <span class="font-black text-sm text-[#0F2745]">${r.userName}</span>
               <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.2 rounded-full">
@@ -1353,7 +1610,7 @@
 
           <!-- 現場照片直接秀出 -->
           ${directImgUrl ? `
-            <div class="mt-2 relative group cursor-pointer" onclick="openLightbox('${directImgUrl}', '${r.userName} - ${r.pointId}')">
+            <div class="mt-2 relative group cursor-pointer" onclick="openLightbox('${directImgUrl}', '${r.userName} - ${displayPoint}')">
               <img src="${directImgUrl}" 
                    class="w-full max-h-52 object-cover rounded-xl border border-blue-100/80 shadow-sm transition hover:opacity-95" 
                    alt="現場路口照" 
