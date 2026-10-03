@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Dan Cup 丹盃 越野登山車賽 · 賽道執勤前進指揮系統</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Leaflet.js 開源地圖庫 (支援免 API Key 直接載入 Google 衛星空照圖) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: #F6F8F6;
+      background-color: #F5F7F5;
       color: #1A231E;
       -webkit-tap-highlight-color: transparent;
     }
@@ -32,33 +35,28 @@
       background: linear-gradient(135deg, #059669 0%, #047857 100%);
       color: #FFFFFF;
     }
-    .tag-xcp {
-      background-color: #FEF3C7;
-      color: #92400E;
-      border: 1px solid #FDE68A;
+    .leaflet-popup-content-wrapper {
+      border-radius: 0.75rem;
+      padding: 0.25rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
     }
-    .tag-enduro {
-      background-color: #FFEDD5;
-      color: #9A3412;
-      border: 1px solid #FED7AA;
-    }
-    .tag-traffic {
-      background-color: #E0E7FF;
-      color: #3730A3;
-      border: 1px solid #C7D2FE;
+    .leaflet-popup-content {
+      margin: 8px 10px;
+      line-height: 1.4;
+      font-family: inherit;
     }
   </style>
 </head>
-<body class="min-h-screen pb-12 antialiased selection:bg-orange-500 selection:text-white">
+<body class="min-h-screen pb-16 antialiased selection:bg-orange-500 selection:text-white">
 
   <!-- ================= 頂部賽事切換 Banner ================= -->
-  <div class="bg-[#1C2520] text-emerald-300 text-xs py-2 px-3 border-b border-emerald-900/40">
+  <div class="bg-[#141B17] text-emerald-300 text-xs py-2 px-3 border-b border-emerald-900/40">
     <div class="max-w-2xl mx-auto flex items-center justify-between">
       <div class="flex items-center space-x-1.5 truncate">
         <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
         <span class="font-bold text-white">🚵‍♂️ Dan Cup 丹盃 越野登山車前進指揮系統</span>
       </div>
-      <a href="index.html" class="bg-emerald-950/80 hover:bg-emerald-900 text-emerald-200 border border-emerald-700/60 font-bold px-2.5 py-0.5 rounded-full text-[11px] shrink-0 transition flex items-center shadow-xs">
+      <a href="index.html" class="bg-emerald-950 hover:bg-emerald-900 text-emerald-200 border border-emerald-700/60 font-bold px-2.5 py-0.5 rounded-full text-[11px] shrink-0 transition flex items-center shadow-xs">
         <span>切換至 2026 環法賽</span>
         <span class="ml-1 text-[10px]">↗</span>
       </a>
@@ -141,15 +139,15 @@
 
     <!-- ================= 🔀 雙視角切換器 (志工打卡執勤 vs 指揮官全盤看板) ================= -->
     <div class="sticky top-14 z-30 bg-[#141B17]/95 backdrop-blur-md p-1.5 rounded-2xl border border-orange-500/40 shadow-sm flex items-center gap-1.5">
-      <button type="button" id="tabBtnVolunteer" onclick="switchViewMode('volunteer')" class="flex-1 py-2 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center transition active:scale-98 shadow-xs bg-orange-600 text-white">
+      <button type="button" id="tabBtnVolunteer" onclick="switchViewMode('volunteer')" class="flex-1 py-2.5 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center transition active:scale-98 shadow-xs bg-orange-600 text-white">
         <span class="mr-1.5 text-base">🚵‍♂️</span>
         <span>裁判/志工個人執勤</span>
         <span class="ml-1 text-[10px] font-normal opacity-85 hidden sm:inline">(自動帶入任務)</span>
       </button>
-      <button type="button" id="tabBtnCommander" onclick="switchViewMode('commander')" class="flex-1 py-2 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center transition active:scale-98 text-slate-300 hover:text-white hover:bg-white/10">
+      <button type="button" id="tabBtnCommander" onclick="switchViewMode('commander')" class="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center transition active:scale-98 text-slate-300 hover:text-white hover:bg-white/10">
         <span class="mr-1.5 text-base">🗺️</span>
         <span>總指揮官全盤看板</span>
-        <span class="ml-1 text-[10px] font-normal opacity-75 hidden sm:inline">(35站/車輛/名冊)</span>
+        <span class="ml-1 text-[10px] font-normal opacity-75 hidden sm:inline">(分線管理/地圖)</span>
       </button>
     </div>
 
@@ -179,14 +177,12 @@
               <label class="block text-[#1A231E] font-bold mb-1">① 您的姓名 *</label>
               <select id="volunteerName" required onchange="handleVolunteerSelect(event)" class="w-full bg-orange-50/50 border border-orange-200 text-orange-950 rounded-xl p-2.5 font-bold focus:ring-2 focus:ring-orange-500 focus:outline-none text-sm">
                 <option value="">-- 請選擇您的姓名 (38員) --</option>
-                <!-- JS 動態填入所有 38 位姓名 -->
               </select>
             </div>
 
             <div>
               <label class="block text-[#1A231E] font-bold mb-1">② 被分配定點 (選姓名自動帶出)</label>
               <select id="assignedPoint" required class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl p-2.5 font-semibold focus:ring-2 focus:ring-orange-500 focus:outline-none">
-                <!-- JS 動態填入 35 個點位 -->
               </select>
             </div>
           </div>
@@ -221,19 +217,21 @@
               <div class="font-bold text-orange-950 flex items-center">
                 <span>🛡️ 核心工作職責：</span>
               </div>
-              <div class="text-slate-700 leading-relaxed" id="briefDuty">
-                -
-              </div>
+              <div class="text-slate-700 leading-relaxed" id="briefDuty">-</div>
             </div>
 
             <div id="briefNoteContainer" class="hidden bg-amber-100/70 p-2 rounded-xl border border-amber-200 text-[11px] text-amber-950 font-medium">
               📌 <strong>大會特別備註：</strong> <span id="briefNote"></span>
             </div>
 
-            <!-- 地圖導航按鈕 -->
-            <a id="briefMapBtn" href="#" target="_blank" class="block w-full text-center bg-orange-600 hover:bg-orange-700 text-white font-black py-2 rounded-xl text-xs shadow-xs transition active:scale-98">
-              🗺️ 點此開啟此點位的 Google Maps 導航 ↗
-            </a>
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button type="button" id="briefPreviewMapBtn" onclick="openEmbeddedMapFromBriefing()" class="bg-white hover:bg-slate-50 text-orange-800 border border-orange-300 font-black py-2 rounded-xl text-xs shadow-xs transition active:scale-98">
+                👁️ 站內地圖預覽
+              </button>
+              <a id="briefMapBtn" href="#" target="_blank" class="block text-center bg-orange-600 hover:bg-orange-700 text-white font-black py-2 rounded-xl text-xs shadow-xs transition active:scale-98">
+                🗺️ App 導航 ↗
+              </a>
+            </div>
           </div>
 
           <!-- GPS 座標擷取區塊 -->
@@ -349,7 +347,7 @@
     </div>
 
     <!-- ========================================================
-         視角二：🗺️ 大會總指揮官全盤看板區塊 (35站/車輛/名冊/相片)
+         視角二：🗺️ 大會總指揮官全盤看板區塊 (按 Line 分線管理 + 地圖)
          ======================================================== -->
     <div id="viewCommanderWrapper" class="space-y-4 hidden">
 
@@ -374,68 +372,83 @@
         </div>
       </section>
 
-      <!-- 賽段分區 ＆ 接駁司機快捷篩選器 -->
-      <section class="card-base p-3 space-y-2.5 border-orange-200">
-        <div>
-          <span class="text-[11px] font-black text-slate-500 uppercase tracking-wider block mb-1">賽段分區篩選</span>
-          <div class="flex items-center gap-1.5 flex-wrap">
-            <button type="button" onclick="setCategoryFilter('all')" id="catBtnAll" class="px-2.5 py-1 rounded-lg text-xs font-black bg-orange-600 text-white shadow-xs">
-              全部 (35)
-            </button>
-            <button type="button" onclick="setCategoryFilter('xcp')" id="catBtnXcp" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700">
-              🚵‍♂️ XCP 越野 (12)
-            </button>
-            <button type="button" onclick="setCategoryFilter('enduro')" id="catBtnEnduro" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700">
-              ⚡ Enduro A~E (17)
-            </button>
-            <button type="button" onclick="setCategoryFilter('traffic')" id="catBtnTraffic" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700">
-              🚦 外圍交管/會場 (6)
-            </button>
+      <!-- ================= 🗺️ Dan Cup 賽道互動衛星地圖看板 ================= -->
+      <section class="card-base p-3.5 border-orange-200 space-y-2">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <div class="flex items-center space-x-2">
+            <span class="text-base">🗺️</span>
+            <div>
+              <h3 class="font-black text-xs sm:text-sm text-orange-950">Dan Cup 賽道全域互動地圖 (Google 衛星混合層)</h3>
+              <p class="text-[10px] text-slate-500">直接在地圖上拖曳、縮放檢視恆春/門馬羅林道 35 大定點與即時到崗人員</p>
+            </div>
           </div>
+          <button type="button" onclick="locateUserOnMap()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold px-2 py-1 rounded-lg text-[10px] flex items-center shrink-0">
+            📍 定位我
+          </button>
         </div>
 
-        <div class="pt-2 border-t border-slate-100">
-          <span class="text-[11px] font-black text-orange-900 uppercase tracking-wider block mb-1 flex items-center">
-            <span class="mr-1">🚐</span> 接駁車輛司機專用篩選 (誰載誰)：
+        <div id="dancupMap" class="w-full h-72 sm:h-80 rounded-xl border border-slate-300 z-10 shadow-inner">
+          <!-- Leaflet 地圖容器 -->
+        </div>
+
+        <div class="flex items-center justify-between text-[10px] text-slate-500 pt-0.5">
+          <span class="flex items-center">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1"></span> 🟢 已到崗標記
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-orange-500 mx-1 ml-2"></span> 🟠 賽道規劃定點
           </span>
-          <div class="flex items-center gap-1.5 flex-wrap">
-            <button type="button" onclick="setDriverFilter('all')" id="drvBtnAll" class="px-2 py-0.5 rounded-md text-[11px] font-black bg-slate-800 text-white">
-              不限司機
-            </button>
-            <button type="button" onclick="setDriverFilter('江爸')" id="drvBtnJiang" class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300">
-              🚐 江爸車 (12:00/12:30/13:00)
-            </button>
-            <button type="button" onclick="setDriverFilter('廉')" id="drvBtnLian" class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300">
-              🚙 阿廉車 (A/B/D/E終點)
-            </button>
-            <button type="button" onclick="setDriverFilter('忠義')" id="drvBtnZhong" class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-blue-100 hover:bg-blue-200 text-blue-900 border border-blue-300">
-              🚑 忠義車 (六福/車床)
-            </button>
-            <button type="button" onclick="setDriverFilter('鎖骨')" id="drvBtnSuo" class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-rose-100 hover:bg-rose-200 text-rose-900 border border-rose-300">
-              🏍️ 鎖骨車 (綠色柵欄/呆風)
-            </button>
-            <button type="button" onclick="setDriverFilter('自行')" id="drvBtnSelf" class="px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200">
-              🚴 自行騎車組
-            </button>
-          </div>
+          <span class="text-orange-800 font-bold">點擊地圖標記可看該站人員與任務</span>
         </div>
       </section>
 
-      <!-- 35 大定點即時配置看板 (Station-Centric) -->
-      <section class="card-base p-4 border-orange-200">
-        <div class="flex items-center justify-between mb-3 border-b border-orange-100 pb-2">
+      <!-- 接駁司機快捷篩選器 -->
+      <section class="card-base p-3 border-orange-200 space-y-1.5">
+        <span class="text-[11px] font-black text-orange-900 uppercase tracking-wider block flex items-center">
+          <span class="mr-1">🚐</span> 接駁車輛司機篩選 (江爸 / 阿廉 / 忠義 / 鎖骨)：
+        </span>
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <button type="button" onclick="setDriverFilter('all')" id="drvBtnAll" class="px-2 py-1 rounded-lg text-[11px] font-black bg-slate-800 text-white shadow-xs">
+            不限司機 (全部)
+          </button>
+          <button type="button" onclick="setDriverFilter('江爸')" id="drvBtnJiang" class="px-2 py-1 rounded-lg text-[11px] font-bold bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300">
+            🚐 江爸車 (12:00/12:30/13:00)
+          </button>
+          <button type="button" onclick="setDriverFilter('廉')" id="drvBtnLian" class="px-2 py-1 rounded-lg text-[11px] font-bold bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300">
+            🚙 阿廉車 (A/B/D/E終點)
+          </button>
+          <button type="button" onclick="setDriverFilter('忠義')" id="drvBtnZhong" class="px-2 py-1 rounded-lg text-[11px] font-bold bg-blue-100 hover:bg-blue-200 text-blue-900 border border-blue-300">
+            🚑 忠義車 (六福/車床)
+          </button>
+          <button type="button" onclick="setDriverFilter('鎖骨')" id="drvBtnSuo" class="px-2 py-1 rounded-lg text-[11px] font-bold bg-rose-100 hover:bg-rose-200 text-rose-900 border border-rose-300">
+            🏍️ 鎖骨車 (綠色柵欄/呆風)
+          </button>
+          <button type="button" onclick="setDriverFilter('自行')" id="drvBtnSelf" class="px-2 py-1 rounded-lg text-[11px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200">
+            🚴 自行騎車組
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= ⚡ 7 大賽段按 Line 路線分組折疊看板 (務實管理) ================= -->
+      <section class="card-base p-4 border-orange-200 space-y-3">
+        <div class="flex items-center justify-between border-b border-orange-100 pb-2">
           <div>
             <h3 class="text-xs font-black text-orange-950 flex items-center">
-              <span class="text-base mr-1.5">📍</span>
-              Dan Cup 賽道 35 大定點即時部署表
+              <span class="text-base mr-1.5">📂</span>
+              賽道分線務實管理看板 (按 Line 路線分組)
             </h3>
-            <p class="text-[10px] text-slate-500">以定點掌握人員到崗、接駁車輛、工作任務與現場照片</p>
+            <p class="text-[10px] text-slate-500">點擊各路線標題可單獨展開/收合，清楚掌握各線到崗狀況與跳台安全</p>
           </div>
-          <span class="text-[11px] font-bold text-orange-800" id="stationCountDisplay">共 35 站</span>
+          <div class="flex items-center space-x-1.5">
+            <button type="button" onclick="expandAllLines()" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded-md border border-slate-200">
+              全部展開
+            </button>
+            <button type="button" onclick="collapseAllLines()" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded-md border border-slate-200">
+              全部收合
+            </button>
+          </div>
         </div>
 
-        <div class="space-y-2.5" id="stationsBoardList">
-          <!-- JS 動態渲染定點卡片 -->
+        <div id="linesAccordionContainer" class="space-y-3">
+          <!-- JS 動態生成 7 大 Line 折疊手風琴區塊 -->
         </div>
       </section>
 
@@ -484,7 +497,7 @@
         <span>本系統由</span>
         <span class="font-bold text-[#141B17]">國立中興大學 匹克球運動科技實驗室</span>
         <span>建立</span>
-        <span class="bg-orange-100 text-orange-800 text-[10px] font-black px-1.5 py-0.5 rounded">Dan Cup 丹盃專用版 v1.0.0</span>
+        <span class="bg-orange-100 text-orange-800 text-[10px] font-black px-1.5 py-0.5 rounded">Dan Cup 丹盃專用版 v1.1.0</span>
       </div>
       <div>
         <a href="https://kalmangoose.github.io/nchu-pickleball-recruit/index.html" 
@@ -501,6 +514,30 @@
     </footer>
 
   </main>
+
+  <!-- ================= 🗺️ 站內 Google Maps 互動預覽 Modal ================= -->
+  <div id="embeddedMapModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 hidden" onclick="closeEmbeddedMapModal()">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-4 space-y-3 shadow-2xl border border-orange-200" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between border-b pb-2">
+        <div>
+          <h3 class="font-black text-sm text-orange-950" id="embedMapModalTitle">Google Maps 定點位置預覽</h3>
+          <p class="text-[10px] text-slate-500">免跳轉即可在站內縮放檢視衛星地圖</p>
+        </div>
+        <button onclick="closeEmbeddedMapModal()" class="text-slate-400 hover:text-slate-600 p-1 text-sm font-bold">✕</button>
+      </div>
+
+      <div class="relative w-full h-72 sm:h-96 rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
+        <iframe id="embedMapIframe" src="" class="w-full h-full border-0" loading="lazy" allowfullscreen></iframe>
+      </div>
+
+      <div class="flex items-center justify-between pt-1">
+        <span class="text-[11px] text-slate-500">若需車機語音導航：</span>
+        <a id="embedMapAppBtn" href="#" target="_blank" class="bg-orange-600 hover:bg-orange-700 text-white font-black px-3 py-1.5 rounded-xl text-xs shadow-xs transition">
+          🚀 在 Google Maps App 中導航 ↗
+        </a>
+      </div>
+    </div>
+  </div>
 
   <!-- ================= 👤 志工點位到崗詳情 Modal ================= -->
   <div id="volunteerDetailModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
@@ -564,7 +601,6 @@
 
   <!-- ================= 核心 JavaScript ================= -->
   <script>
-    // Dan Cup 丹盃 原始定點、工作任務與人員名冊
     const DANCUP_POINTS_CONFIG = [
   {
     "id": "定點1",
@@ -578,7 +614,8 @@
     ],
     "timeWindow": "0750-0920",
     "depart": "自行騎車前往",
-    "returnWay": "自行騎車前往"
+    "returnWay": "自行騎車前往",
+    "lineGroupId": "xcp"
   },
   {
     "id": "定點2",
@@ -592,7 +629,8 @@
     ],
     "timeWindow": "0830-1020",
     "depart": "鎖骨",
-    "returnWay": "鎖骨"
+    "returnWay": "鎖骨",
+    "lineGroupId": "xcp"
   },
   {
     "id": "定點3",
@@ -607,7 +645,8 @@
     ],
     "timeWindow": "0830-1020",
     "depart": "忠義/六福",
-    "returnWay": "定點18/六福"
+    "returnWay": "定點18/六福",
+    "lineGroupId": "xcp"
   },
   {
     "id": "定點4",
@@ -621,7 +660,8 @@
     ],
     "timeWindow": "0830-1020",
     "depart": "江爸/龍鑾",
-    "returnWay": "江爸B線12點"
+    "returnWay": "江爸B線12點",
+    "lineGroupId": "xcp"
   },
   {
     "id": "定點5",
@@ -635,7 +675,8 @@
     ],
     "timeWindow": "0830-1150",
     "depart": "江爸/龍鑾",
-    "returnWay": "江爸B線12點"
+    "returnWay": "江爸B線12點",
+    "lineGroupId": "xcp"
   },
   {
     "id": "定點6",
@@ -650,7 +691,8 @@
     ],
     "timeWindow": "0700-1230",
     "depart": "江爸/龍鑾",
-    "returnWay": "江爸12點半"
+    "returnWay": "江爸12點半",
+    "lineGroupId": "xcp"
   },
   {
     "id": "定點7",
@@ -664,7 +706,8 @@
     ],
     "timeWindow": "0840-1150",
     "depart": "江爸/綠色柵欄",
-    "returnWay": "江爸1點 綠色柵欄"
+    "returnWay": "江爸1點 綠色柵欄",
+    "lineGroupId": "xcp"
   },
   {
     "id": "定點8",
@@ -678,7 +721,8 @@
     ],
     "timeWindow": "0900-1220",
     "depart": "自行騎車返回",
-    "returnWay": "自行騎車返回"
+    "returnWay": "自行騎車返回",
+    "lineGroupId": "xcp"
   },
   {
     "id": "定點9",
@@ -692,7 +736,8 @@
     ],
     "timeWindow": "0900-1300",
     "depart": "鎖骨/呆風",
-    "returnWay": "鎖骨/呆風"
+    "returnWay": "鎖骨/呆風",
+    "lineGroupId": "xcp"
   },
   {
     "id": "定點10",
@@ -706,7 +751,8 @@
     ],
     "timeWindow": "0700-0730",
     "depart": "自行出發",
-    "returnWay": "自行返回會場"
+    "returnWay": "自行返回會場",
+    "lineGroupId": "xcp"
   },
   {
     "id": "定點11",
@@ -720,7 +766,8 @@
     ],
     "timeWindow": "0700-0820",
     "depart": "自行騎車前往",
-    "returnWay": "自行騎車返回"
+    "returnWay": "自行騎車返回",
+    "lineGroupId": "xcp"
   },
   {
     "id": "定點12",
@@ -734,7 +781,8 @@
     ],
     "timeWindow": "0740-0950",
     "depart": "江爸/龍鑾",
-    "returnWay": "阿廉/A終點"
+    "returnWay": "阿廉/A終點",
+    "lineGroupId": "line_a"
   },
   {
     "id": "定點13",
@@ -748,7 +796,8 @@
     ],
     "timeWindow": "0800-1230",
     "depart": "忠義/車床天地",
-    "returnWay": "阿廉/A終點"
+    "returnWay": "阿廉/A終點",
+    "lineGroupId": "line_a"
   },
   {
     "id": "定點14",
@@ -762,7 +811,8 @@
     ],
     "timeWindow": "0750-0950",
     "depart": "忠義/車床天地",
-    "returnWay": "阿廉/A終點"
+    "returnWay": "阿廉/A終點",
+    "lineGroupId": "line_a"
   },
   {
     "id": "定點15",
@@ -776,7 +826,8 @@
     ],
     "timeWindow": "0830-1040",
     "depart": "江爸/龍鑾",
-    "returnWay": "阿廉/Ｂ終點"
+    "returnWay": "阿廉/Ｂ終點",
+    "lineGroupId": "line_b"
   },
   {
     "id": "定點16",
@@ -790,7 +841,8 @@
     ],
     "timeWindow": "0900-1040",
     "depart": "自行騎車前往",
-    "returnWay": "自行騎車返回"
+    "returnWay": "自行騎車返回",
+    "lineGroupId": "line_b"
   },
   {
     "id": "定點17",
@@ -804,7 +856,8 @@
     ],
     "timeWindow": "0840-1040",
     "depart": "忠義/B線終點",
-    "returnWay": "阿廉/Ｂ終點"
+    "returnWay": "阿廉/Ｂ終點",
+    "lineGroupId": "line_b"
   },
   {
     "id": "定點18",
@@ -818,7 +871,8 @@
     ],
     "timeWindow": "0900-1040",
     "depart": "自行騎摩托車前往",
-    "returnWay": "自行騎摩托車返回"
+    "returnWay": "自行騎摩托車返回",
+    "lineGroupId": "line_b"
   },
   {
     "id": "定點19",
@@ -832,7 +886,8 @@
     ],
     "timeWindow": "1030-1150",
     "depart": "鎖骨/水泥路",
-    "returnWay": "江爸1點 水泥路"
+    "returnWay": "江爸1點 水泥路",
+    "lineGroupId": "line_c"
   },
   {
     "id": "定點20",
@@ -846,7 +901,8 @@
     ],
     "timeWindow": "1100-1150",
     "depart": "江爸/水泥路",
-    "returnWay": "江爸1點 水泥路"
+    "returnWay": "江爸1點 水泥路",
+    "lineGroupId": "line_c"
   },
   {
     "id": "定點21",
@@ -860,7 +916,8 @@
     ],
     "timeWindow": "1100-1150",
     "depart": "江爸/水泥路",
-    "returnWay": "江爸1點 水泥路"
+    "returnWay": "江爸1點 水泥路",
+    "lineGroupId": "line_c"
   },
   {
     "id": "定點22",
@@ -874,7 +931,8 @@
     ],
     "timeWindow": "1100-1150",
     "depart": "江爸/水泥路",
-    "returnWay": "江爸1點 水泥路"
+    "returnWay": "江爸1點 水泥路",
+    "lineGroupId": "line_c"
   },
   {
     "id": "定點23",
@@ -888,7 +946,8 @@
     ],
     "timeWindow": "1100-1150",
     "depart": "江爸/水泥路",
-    "returnWay": "江爸1點 水泥路"
+    "returnWay": "江爸1點 水泥路",
+    "lineGroupId": "line_c"
   },
   {
     "id": "定點24",
@@ -902,7 +961,8 @@
     ],
     "timeWindow": "0950-1240",
     "depart": "鎖骨/D線起點",
-    "returnWay": "江爸1點 水泥路"
+    "returnWay": "江爸1點 水泥路",
+    "lineGroupId": "line_d"
   },
   {
     "id": "定點25",
@@ -916,7 +976,8 @@
     ],
     "timeWindow": "1020-1240",
     "depart": "廉/D線終點",
-    "returnWay": "廉/D線終點 12點半"
+    "returnWay": "廉/D線終點 12點半",
+    "lineGroupId": "line_d"
   },
   {
     "id": "定點26",
@@ -930,7 +991,8 @@
     ],
     "timeWindow": "1000-1240",
     "depart": "廉/D線終點",
-    "returnWay": "廉/D線終點 12點半"
+    "returnWay": "廉/D線終點 12點半",
+    "lineGroupId": "line_d"
   },
   {
     "id": "定點27",
@@ -944,7 +1006,8 @@
     ],
     "timeWindow": "1030-1320",
     "depart": "廉/E線起點",
-    "returnWay": "廉/Ｅ線起點 1點"
+    "returnWay": "廉/Ｅ線起點 1點",
+    "lineGroupId": "line_e"
   },
   {
     "id": "定點28",
@@ -958,7 +1021,8 @@
     ],
     "timeWindow": "1100-1320",
     "depart": "廉/E線起點",
-    "returnWay": "廉/Ｅ線終點 1點"
+    "returnWay": "廉/Ｅ線終點 1點",
+    "lineGroupId": "line_e"
   },
   {
     "id": "定點29",
@@ -972,7 +1036,8 @@
     ],
     "timeWindow": "1040-1320",
     "depart": "廉/E線終點",
-    "returnWay": "廉/Ｅ線終點 1點"
+    "returnWay": "廉/Ｅ線終點 1點",
+    "lineGroupId": "line_e"
   },
   {
     "id": "定點30",
@@ -986,7 +1051,8 @@
     ],
     "timeWindow": "0700-1320",
     "depart": "自行騎摩托車前往",
-    "returnWay": "自行騎摩托車返回"
+    "returnWay": "自行騎摩托車返回",
+    "lineGroupId": "traffic"
   },
   {
     "id": "定點31",
@@ -1000,7 +1066,8 @@
     ],
     "timeWindow": "0700-1230",
     "depart": "自行騎車前往",
-    "returnWay": "自行騎車返回"
+    "returnWay": "自行騎車返回",
+    "lineGroupId": "traffic"
   },
   {
     "id": "定點32",
@@ -1014,7 +1081,8 @@
     ],
     "timeWindow": "0700-1230",
     "depart": "鎖骨/綠色柵欄",
-    "returnWay": "江爸1點/綠色柵欄"
+    "returnWay": "江爸1點/綠色柵欄",
+    "lineGroupId": "traffic"
   },
   {
     "id": "主會場",
@@ -1030,7 +1098,8 @@
     ],
     "timeWindow": "0530-1630",
     "depart": "",
-    "returnWay": ""
+    "returnWay": "",
+    "lineGroupId": "traffic"
   },
   {
     "id": "E線終點拍照",
@@ -1044,7 +1113,8 @@
     ],
     "timeWindow": "1000-1340",
     "depart": "鎖骨",
-    "returnWay": "鎖骨"
+    "returnWay": "鎖骨",
+    "lineGroupId": "line_e"
   },
   {
     "id": "XCP2終點拍照",
@@ -1058,7 +1128,8 @@
     ],
     "timeWindow": "0920-1300",
     "depart": "",
-    "returnWay": ""
+    "returnWay": "",
+    "lineGroupId": "xcp"
   }
 ];
     const DANCUP_ROSTER_LIST = [
@@ -1571,8 +1642,107 @@
   "陳鈺翔",
   "黃元泰"
 ];
+    const DANCUP_LINE_GROUPS = [
+  {
+    "id": "xcp",
+    "name": "🚵‍♂️ XCP 越野賽段",
+    "badge": "XCP 越野 (12站)",
+    "pointIds": [
+      "定點1",
+      "定點2",
+      "定點3",
+      "定點4",
+      "定點5",
+      "定點6",
+      "定點7",
+      "定點8",
+      "定點9",
+      "定點10",
+      "定點11",
+      "XCP2終點拍照"
+    ],
+    "color": "amber",
+    "desc": "恆春/門馬羅越野單圈：石牛溪救護、大崩壁盲彎、龍鑾補給站與 XCP 終點"
+  },
+  {
+    "id": "line_a",
+    "name": "⚡ Enduro A Line",
+    "badge": "A 線 (3站)",
+    "pointIds": [
+      "定點12",
+      "定點13",
+      "定點14"
+    ],
+    "color": "emerald",
+    "desc": "A線起點 ➔ 轉接道BCD交叉管制 ➔ A線終點 (接駁：江爸/阿廉)"
+  },
+  {
+    "id": "line_b",
+    "name": "⚡ Enduro B Line",
+    "badge": "B 線 (4站)",
+    "pointIds": [
+      "定點15",
+      "定點16",
+      "定點17",
+      "定點18"
+    ],
+    "color": "cyan",
+    "desc": "B線起點 ➔ 深溝機動 ➔ B線終點 ➔ 南灣7-11指示 (接駁：江爸/阿廉/忠義)"
+  },
+  {
+    "id": "line_c",
+    "name": "⚡ Enduro C Line",
+    "badge": "C 線 (5站)",
+    "pointIds": [
+      "定點19",
+      "定點20",
+      "定點21",
+      "定點22",
+      "定點23"
+    ],
+    "color": "blue",
+    "desc": "C線起點 ➔ 水泥路連續交管點(20/21/22) ➔ C線終點 (接駁：鎖骨/江爸1點)"
+  },
+  {
+    "id": "line_d",
+    "name": "⚡ Enduro D Line · 跳台安全",
+    "badge": "D 線 · 跳台 (3站)",
+    "pointIds": [
+      "定點24",
+      "定點25",
+      "定點26"
+    ],
+    "color": "purple",
+    "desc": "D線起點 ➔ ⚠️【定點25 跳台安全維護】 ➔ D線終點 (接駁：廉/D線終點12:30)"
+  },
+  {
+    "id": "line_e",
+    "name": "⚡ Enduro E Line",
+    "badge": "E 線 (4站)",
+    "pointIds": [
+      "定點27",
+      "定點28",
+      "定點29",
+      "E線終點拍照"
+    ],
+    "color": "orange",
+    "desc": "E線起點 ➔ 機動救護 ➔ E線終點 ➔ E線拍立得拍照 (接駁：廉/E線起終點1點/鎖骨)"
+  },
+  {
+    "id": "traffic",
+    "name": "🚦 外圍道路交管與主會場",
+    "badge": "外圍交管/會場 (4站)",
+    "pointIds": [
+      "定點30",
+      "定點31",
+      "定點32",
+      "主會場"
+    ],
+    "color": "slate",
+    "desc": "縣道200機動巡邏、馬路交管、綠色柵欄主要管制點、主會場停車場"
+  }
+];
 
-    // Google Apps Script Web App URL (支援 event="dancup" 自動路由至 DanCup 獨立分頁)
     const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycby4GL3hYmIk5YGqT5ysT5Vr35ee3MkgcQSxpBqBbmTX3cDbIJ1JAXu0VSj8ZTCFIjad/exec";
     const AUTH_HASH = "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"; // 帳密 123
 
@@ -1581,22 +1751,33 @@
     let currentAccuracy = null;
     let compressedPhotoBase64 = '';
     let onlineDataCache = [];
-    let currentCategoryFilter = 'all';
     let currentDriverFilter = 'all';
     let currentViewMode = localStorage.getItem("dancup_view_mode") || "volunteer";
+    let mapInstance = null;
+    let mapMarkers = [];
+
+    // 路線折疊狀態記憶 (預設展開 XCP 與 D 線跳台)
+    let expandedGroups = {
+      'xcp': true,
+      'line_a': false,
+      'line_b': false,
+      'line_c': false,
+      'line_d': true,
+      'line_e': false,
+      'traffic': false
+    };
 
     document.addEventListener("DOMContentLoaded", () => {
       checkAdminStatus();
       initDropdowns();
       switchViewMode(currentViewMode);
-      renderStationsBoard();
+      renderLinesAccordion();
       renderRoster();
       renderPhotoWall(onlineDataCache);
       fetchOnlineRecords();
       setInterval(fetchOnlineRecords, 15000);
     });
 
-    // 初始化姓名與點位下拉選單
     function initDropdowns() {
       const nameSelect = document.getElementById("volunteerName");
       const ptSelect = document.getElementById("assignedPoint");
@@ -1618,7 +1799,8 @@
       });
     }
 
-    // 智能個人執勤卡：志工選取姓名時，自動帶入其分配點位、接駁方式與工作內容
+    // 智能個人任務卡
+    let currentSelectedPerson = null;
     function handleVolunteerSelect(e) {
       const selectedName = e.target.value;
       const briefingBox = document.getElementById("volunteerBriefingBox");
@@ -1626,10 +1808,13 @@
 
       if (!selectedName) {
         briefingBox.classList.add("hidden");
+        currentSelectedPerson = null;
         return;
       }
 
       const person = DANCUP_ROSTER_LIST.find(r => r.name === selectedName);
+      currentSelectedPerson = person;
+
       if (person) {
         for (let i = 0; i < assignedSelect.options.length; i++) {
           if (assignedSelect.options[i].value.startsWith(person.pointId)) {
@@ -1666,7 +1851,13 @@
       }
     }
 
-    // 視角切換器 (志工打卡 vs 指揮官看板)
+    function openEmbeddedMapFromBriefing() {
+      if (currentSelectedPerson) {
+        openEmbeddedMap(currentSelectedPerson.pointId, currentSelectedPerson.pointLabel, currentSelectedPerson.mapUrl);
+      }
+    }
+
+    // 視角切換器
     function switchViewMode(mode) {
       currentViewMode = mode;
       localStorage.setItem("dancup_view_mode", mode);
@@ -1679,145 +1870,331 @@
       if (!volTab || !cmdTab || !volWrap || !cmdWrap) return;
 
       if (mode === "commander") {
-        cmdTab.className = "flex-1 py-2 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center transition active:scale-98 shadow-xs bg-orange-600 text-white";
-        volTab.className = "flex-1 py-2 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center transition active:scale-98 text-slate-300 hover:text-white hover:bg-white/10";
+        cmdTab.className = "flex-1 py-2.5 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center transition active:scale-98 shadow-xs bg-orange-600 text-white";
+        volTab.className = "flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center transition active:scale-98 text-slate-300 hover:text-white hover:bg-white/10";
         volWrap.classList.add("hidden");
         cmdWrap.classList.remove("hidden");
+        // 初始化地圖 (延遲以確保 DOM 可見)
+        setTimeout(initMapIfNeeded, 100);
       } else {
-        volTab.className = "flex-1 py-2 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center transition active:scale-98 shadow-xs bg-orange-600 text-white";
-        cmdTab.className = "flex-1 py-2 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center transition active:scale-98 text-slate-300 hover:text-white hover:bg-white/10";
+        volTab.className = "flex-1 py-2.5 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center transition active:scale-98 shadow-xs bg-orange-600 text-white";
+        cmdTab.className = "flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center transition active:scale-98 text-slate-300 hover:text-white hover:bg-white/10";
         volWrap.classList.remove("hidden");
         cmdWrap.classList.add("hidden");
       }
     }
 
-    // 賽段分類過濾
-    function setCategoryFilter(cat) {
-      currentCategoryFilter = cat;
-      ['all', 'xcp', 'enduro', 'traffic'].forEach(c => {
-        const btn = document.getElementById('catBtn' + c.charAt(0).toUpperCase() + c.slice(1));
-        if (!btn) return;
-        if (c === cat) {
-          btn.className = "px-2.5 py-1 rounded-lg text-xs font-black bg-orange-600 text-white shadow-xs";
-        } else {
-          btn.className = "px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700";
+    // ================= 🗺️ 初始化 Leaflet Google Hybrid 地圖 =================
+    function initMapIfNeeded() {
+      if (mapInstance) {
+        mapInstance.invalidateSize();
+        return;
+      }
+
+      const mapContainer = document.getElementById("dancupMap");
+      if (!mapContainer) return;
+
+      // 墾丁恆春/滿州門馬羅山賽道中心 [22.008, 120.760]
+      mapInstance = L.map('dancupMap', {
+        center: [22.008, 120.760],
+        zoom: 13,
+        zoomControl: true
+      });
+
+      // 免 API Key 載入 Google Hybrid 衛星混合圖層 (包含林道路線與衛星空照)
+      L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        attribution: '&copy; Google Maps Satellite'
+      }).addTo(mapInstance);
+
+      updateMapMarkers();
+    }
+
+    function updateMapMarkers() {
+      if (!mapInstance) return;
+
+      // 清除舊標記
+      mapMarkers.forEach(m => mapInstance.removeLayer(m));
+      mapMarkers = [];
+
+      // 繪製打卡過的人員 GPS 標記
+      onlineDataCache.forEach(r => {
+        if (r.lat && r.lng) {
+          const lat = parseFloat(r.lat);
+          const lng = parseFloat(r.lng);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            const marker = L.circleMarker([lat, lng], {
+              radius: 8,
+              fillColor: "#10B981",
+              color: "#FFFFFF",
+              weight: 2,
+              opacity: 1,
+              fillOpacity: 0.9
+            }).addTo(mapInstance);
+
+            marker.bindPopup(`
+              <div class="text-xs">
+                <div class="font-black text-emerald-700">🟢 ${r.userName} (已到崗)</div>
+                <div class="font-bold text-slate-800 mt-0.5">${r.pointId}</div>
+                <div class="text-[10px] text-slate-500 font-mono">${r.time || ''}</div>
+                ${r.photoUrl && r.photoUrl.startsWith('http') ? `<div class="mt-1"><a href="${r.photoUrl}" target="_blank" class="text-[10px] text-orange-600 underline font-bold">查看照片 ↗</a></div>` : ''}
+              </div>
+            `);
+            mapMarkers.push(marker);
+          }
         }
       });
-      renderStationsBoard();
     }
 
-    // 接駁司機篩選
+    function locateUserOnMap() {
+      if (!mapInstance) return;
+      if (!navigator.geolocation) {
+        alert("手機不支援定位。");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        mapInstance.setView([lat, lng], 16);
+        const myPin = L.circleMarker([lat, lng], {
+          radius: 9,
+          fillColor: "#3B82F6",
+          color: "#FFFFFF",
+          weight: 3,
+          fillOpacity: 1
+        }).addTo(mapInstance);
+        myPin.bindPopup("<b>📍 您的目前位置</b>").openPopup();
+        mapMarkers.push(myPin);
+      }, err => {
+        alert("無法抓取您的位置，請檢查授權。");
+      });
+    }
+
+    // ================= 站內 Google Maps 嵌入預覽 Modal =================
+    function openEmbeddedMap(pointId, pointLabel, mapUrl) {
+      const modal = document.getElementById("embeddedMapModal");
+      const title = document.getElementById("embedMapModalTitle");
+      const iframe = document.getElementById("embedMapIframe");
+      const appBtn = document.getElementById("embedMapAppBtn");
+
+      title.textContent = `${pointId} ${pointLabel} · Google Maps 預覽`;
+      appBtn.href = mapUrl || "#";
+
+      // 產生免 API Key 的 Google Maps 嵌入網址
+      const query = encodeURIComponent(`恆春 ${pointLabel || pointId}`);
+      iframe.src = `https://maps.google.com/maps?q=${query}&t=k&z=15&output=embed`;
+
+      modal.classList.remove("hidden");
+    }
+    function closeEmbeddedMapModal() {
+      const modal = document.getElementById("embeddedMapModal");
+      const iframe = document.getElementById("embedMapIframe");
+      iframe.src = "";
+      modal.classList.add("hidden");
+    }
+
+    // ================= ⚡ 7 大賽段折疊手風琴看板 (按 Line 管理) =================
+    function toggleLineGroup(groupId) {
+      expandedGroups[groupId] = !expandedGroups[groupId];
+      renderLinesAccordion();
+    }
+
+    function expandAllLines() {
+      DANCUP_LINE_GROUPS.forEach(g => expandedGroups[g.id] = true);
+      renderLinesAccordion();
+    }
+
+    function collapseAllLines() {
+      DANCUP_LINE_GROUPS.forEach(g => expandedGroups[g.id] = false);
+      renderLinesAccordion();
+    }
+
     function setDriverFilter(driver) {
       currentDriverFilter = driver;
-      renderStationsBoard();
+      renderLinesAccordion();
     }
 
-    // 渲染 35 大定點即時配置看板
-    function renderStationsBoard() {
-      const container = document.getElementById("stationsBoardList");
+    function renderLinesAccordion() {
+      const container = document.getElementById("linesAccordionContainer");
       if (!container) return;
       container.innerHTML = "";
 
-      const filtered = DANCUP_POINTS_CONFIG.filter(pt => {
-        // 分類過濾
-        if (currentCategoryFilter !== 'all' && pt.category !== currentCategoryFilter) {
-          return false;
+      // 更新司機篩選按鈕樣式
+      const drvMap = {
+        'all': 'drvBtnAll',
+        '江爸': 'drvBtnJiang',
+        '廉': 'drvBtnLian',
+        '忠義': 'drvBtnZhong',
+        '鎖骨': 'drvBtnSuo',
+        '自行': 'drvBtnSelf'
+      };
+      Object.entries(drvMap).forEach(([k, btnId]) => {
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+        if (k === currentDriverFilter) {
+          btn.classList.add("ring-2", "ring-orange-500", "font-black");
+        } else {
+          btn.classList.remove("ring-2", "ring-orange-500", "font-black");
         }
-        // 司機過濾
-        if (currentDriverFilter !== 'all') {
-          const matchDepart = pt.depart && pt.depart.includes(currentDriverFilter);
-          const matchReturn = pt.returnWay && pt.returnWay.includes(currentDriverFilter);
-          if (!matchDepart && !matchReturn) return false;
-        }
-        return true;
       });
 
-      document.getElementById("stationCountDisplay").textContent = `顯示 ${filtered.length} / 35 站`;
+      DANCUP_LINE_GROUPS.forEach(group => {
+        // 取得此 Line 下的所有站點
+        let points = DANCUP_POINTS_CONFIG.filter(p => p.lineGroupId === group.id);
 
-      filtered.forEach((pt, index) => {
-        const card = document.createElement("div");
-        card.className = "p-3.5 rounded-xl border border-slate-200 bg-white hover:border-orange-300 transition shadow-xs space-y-2";
-
-        // 比對該點的線上打卡紀錄
-        const records = onlineDataCache.filter(r => r.pointId && r.pointId.includes(pt.id));
-        const isCheckedIn = records.length > 0;
-
-        let tagClass = "tag-xcp";
-        let tagText = "XCP 越野";
-        if (pt.category === "enduro") {
-          tagClass = "tag-enduro";
-          tagText = "Enduro 耐力";
-        } else if (pt.category === "traffic") {
-          tagClass = "tag-traffic";
-          tagText = "外圍交管/會場";
+        // 套用司機過濾
+        if (currentDriverFilter !== 'all') {
+          points = points.filter(pt => {
+            const matchDepart = pt.depart && pt.depart.includes(currentDriverFilter);
+            const matchReturn = pt.returnWay && pt.returnWay.includes(currentDriverFilter);
+            return matchDepart || matchReturn;
+          });
+          if (points.length === 0) return; // 該司機未負責此 Line 則隱藏
         }
 
-        card.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-              <span class="bg-orange-600 text-white text-xs font-black px-2 py-0.5 rounded-md">
-                ${pt.id}
-              </span>
-              <span class="font-black text-xs sm:text-sm text-slate-900">${pt.label}</span>
-              <span class="text-[10px] px-1.5 py-0.2 rounded font-bold ${tagClass}">${tagText}</span>
-            </div>
-            <div class="text-[11px] font-mono text-slate-500">
-              ${pt.timeWindow || ''}
-            </div>
+        // 計算該 Line 的到崗進度
+        let totalAssigned = 0;
+        let checkedCount = 0;
+        points.forEach(pt => {
+          pt.assigned.forEach(name => {
+            totalAssigned++;
+            if (onlineDataCache.some(r => r.userName === name)) {
+              checkedCount++;
+            }
+          });
+        });
+
+        const isExpanded = !!expandedGroups[group.id];
+
+        const lineWrapper = document.createElement("div");
+        lineWrapper.className = "border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-xs transition";
+
+        // Line 標題手風琴 Header
+        const header = document.createElement("div");
+        header.onclick = () => toggleLineGroup(group.id);
+        header.className = `p-3.5 flex items-center justify-between cursor-pointer transition select-none ${
+          isExpanded ? 'bg-orange-50/70 border-b border-orange-200/80' : 'bg-slate-50/80 hover:bg-slate-100'
+        }`;
+
+        let statusBadge = '';
+        if (totalAssigned > 0) {
+          if (checkedCount === totalAssigned) {
+            statusBadge = `<span class="text-[10px] bg-emerald-600 text-white font-black px-2 py-0.5 rounded-full">🟢 ${checkedCount}/${totalAssigned} 全數就位</span>`;
+          } else {
+            statusBadge = `<span class="text-[10px] bg-amber-500 text-white font-bold px-2 py-0.5 rounded-full">⏳ ${checkedCount}/${totalAssigned} 就位中</span>`;
+          }
+        } else {
+          statusBadge = `<span class="text-[10px] bg-slate-200 text-slate-600 font-medium px-2 py-0.5 rounded-full">${points.length} 站點</span>`;
+        }
+
+        header.innerHTML = `
+          <div class="flex items-center space-x-2 truncate mr-2">
+            <span class="font-black text-xs sm:text-sm text-slate-900 flex items-center truncate">
+              ${group.name}
+            </span>
+            <span class="text-[10px] bg-orange-100 text-orange-800 font-bold px-2 py-0.2 rounded-md shrink-0">
+              ${points.length} 站
+            </span>
           </div>
-
-          <!-- 分配志工與到崗狀態 -->
-          <div class="flex items-center space-x-1.5 flex-wrap gap-1">
-            <span class="text-[11px] text-slate-400 font-medium">執勤人員：</span>
-            ${pt.assigned.map(name => {
-              const checked = onlineDataCache.find(r => r.userName === name && r.pointId && r.pointId.includes(pt.id));
-              if (checked) {
-                return `<button type="button" onclick="openVolunteerDetail('${name}')" class="inline-flex items-center space-x-1 bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2 py-0.5 rounded-full"><span>🟢 ${name}</span><span class="text-[9px] bg-emerald-600 text-white px-1 rounded">已到崗</span></button>`;
-              } else {
-                return `<button type="button" onclick="openVolunteerDetail('${name}')" class="inline-flex items-center space-x-1 bg-amber-100 text-amber-800 text-[11px] font-bold px-2 py-0.5 rounded-full"><span>⏳ ${name}</span><span class="text-[9px] bg-amber-600 text-white px-1 rounded">待就位</span></button>`;
-              }
-            }).join(' ') || '<span class="text-[11px] text-slate-400">待指派</span>'}
-          </div>
-
-          <!-- 前往與回程接駁 -->
-          <div class="grid grid-cols-2 gap-1.5 text-[11px] bg-slate-50 p-2 rounded-lg border border-slate-100">
-            <div>
-              <span class="text-slate-500">🚗 前往方式：</span>
-              <span class="font-bold text-orange-950">${pt.depart || '自行前往'}</span>
-            </div>
-            <div>
-              <span class="text-slate-500">🚙 回程車次：</span>
-              <span class="font-bold text-emerald-900">${pt.returnWay || '自行返回'}</span>
-            </div>
-          </div>
-
-          <!-- 工作內容與備註 -->
-          ${pt.duty ? `
-            <div class="text-[11px] text-slate-700 bg-orange-50/40 p-2 rounded-lg border border-orange-100">
-              <span class="font-bold text-orange-950">🛡️ 職責：</span> ${pt.duty}
-            </div>
-          ` : ''}
-
-          ${pt.note ? `
-            <div class="text-[11px] text-amber-950 bg-amber-50 p-2 rounded-lg border border-amber-200/80">
-              📌 <strong>備註/撤收：</strong> ${pt.note}
-            </div>
-          ` : ''}
-
-          <!-- 操作按鈕 (地圖導航 ↗) -->
-          <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
-            <span class="text-[10px] text-slate-400">Dan Cup 賽道定點</span>
-            <div class="flex items-center space-x-2">
-              ${pt.mapUrl && pt.mapUrl.startsWith('http') ? `
-                <a href="${pt.mapUrl}" target="_blank" class="bg-orange-50 hover:bg-orange-100 text-orange-800 border border-orange-200 font-bold px-2.5 py-1 rounded-lg flex items-center transition shadow-2xs">
-                  🗺️ Google Maps 導航 ↗
-                </a>
-              ` : ''}
-            </div>
+          <div class="flex items-center space-x-2 shrink-0">
+            ${statusBadge}
+            <span class="text-xs text-slate-400 font-bold transition-transform ${isExpanded ? 'rotate-180' : ''}">▼</span>
           </div>
         `;
 
-        container.appendChild(card);
+        lineWrapper.appendChild(header);
+
+        // 展開內容區塊 (包含該 Line 的所有卡片)
+        if (isExpanded) {
+          const content = document.createElement("div");
+          content.className = "p-3 space-y-2.5 bg-slate-50/30";
+
+          // Line 概述小提示
+          if (group.desc) {
+            const descEl = document.createElement("div");
+            descEl.className = "text-[11px] text-slate-500 px-1 leading-relaxed";
+            descEl.innerHTML = `💡 <strong>賽段指引：</strong> ${group.desc}`;
+            content.appendChild(descEl);
+          }
+
+          points.forEach(pt => {
+            const card = document.createElement("div");
+            card.className = "p-3 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-2";
+
+            card.innerHTML = `
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  <span class="bg-orange-600 text-white text-xs font-black px-2 py-0.5 rounded-md">
+                    ${pt.id}
+                  </span>
+                  <span class="font-black text-xs sm:text-sm text-slate-900">${pt.label}</span>
+                </div>
+                <div class="text-[11px] font-mono text-slate-500">
+                  ${pt.timeWindow || ''}
+                </div>
+              </div>
+
+              <!-- 執勤人員與狀態 -->
+              <div class="flex items-center space-x-1.5 flex-wrap gap-1">
+                <span class="text-[11px] text-slate-400 font-medium">執勤人員：</span>
+                ${pt.assigned.map(name => {
+                  const checked = onlineDataCache.find(r => r.userName === name);
+                  if (checked) {
+                    return `<button type="button" onclick="openVolunteerDetail('${name}')" class="inline-flex items-center space-x-1 bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2 py-0.5 rounded-full cursor-pointer hover:bg-emerald-200 transition"><span>🟢 ${name}</span><span class="text-[9px] bg-emerald-600 text-white px-1 rounded">已到崗</span></button>`;
+                  } else {
+                    return `<button type="button" onclick="openVolunteerDetail('${name}')" class="inline-flex items-center space-x-1 bg-amber-100 text-amber-800 text-[11px] font-bold px-2 py-0.5 rounded-full cursor-pointer hover:bg-amber-200 transition"><span>⏳ ${name}</span><span class="text-[9px] bg-amber-600 text-white px-1 rounded">待就位</span></button>`;
+                  }
+                }).join(' ') || '<span class="text-[11px] text-slate-400">待指派</span>'}
+              </div>
+
+              <!-- 接駁車輛 -->
+              <div class="grid grid-cols-2 gap-1.5 text-[11px] bg-slate-50 p-2 rounded-lg border border-slate-100">
+                <div>
+                  <span class="text-slate-500">🚗 前往：</span>
+                  <span class="font-bold text-orange-950">${pt.depart || '自行前往'}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500">🚙 回程：</span>
+                  <span class="font-bold text-emerald-900">${pt.returnWay || '自行返回'}</span>
+                </div>
+              </div>
+
+              <!-- 工作職責 -->
+              ${pt.duty ? `
+                <div class="text-[11px] text-slate-700 bg-orange-50/40 p-2 rounded-lg border border-orange-100 leading-relaxed">
+                  <span class="font-bold text-orange-950">🛡️ 職責：</span> ${pt.duty}
+                </div>
+              ` : ''}
+
+              <!-- 備註/撤收事項 -->
+              ${pt.note ? `
+                <div class="text-[11px] text-amber-950 bg-amber-50 p-2 rounded-lg border border-amber-200/80 leading-relaxed">
+                  📌 <strong>備註/撤收：</strong> ${pt.note}
+                </div>
+              ` : ''}
+
+              <!-- 地圖操作按鈕 (支援站內預覽與外跳導航) -->
+              <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
+                <span class="text-[10px] text-slate-400">${pt.id} 賽道節點</span>
+                <div class="flex items-center space-x-1.5">
+                  <button type="button" onclick="openEmbeddedMap('${pt.id}', '${pt.label}', '${pt.mapUrl}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded-lg flex items-center transition">
+                    👁️ 地圖預覽
+                  </button>
+                  ${pt.mapUrl && pt.mapUrl.startsWith('http') ? `
+                    <a href="${pt.mapUrl}" target="_blank" class="bg-orange-50 hover:bg-orange-100 text-orange-800 border border-orange-200 font-bold px-2 py-1 rounded-lg flex items-center transition">
+                      🗺️ App 導航 ↗
+                    </a>
+                  ` : ''}
+                </div>
+              </div>
+            `;
+            content.appendChild(card);
+          });
+
+          lineWrapper.appendChild(content);
+        }
+
+        container.appendChild(lineWrapper);
       });
     }
 
@@ -1882,9 +2259,14 @@
             ${assignment && assignment.duty ? `<div class="pt-1 border-t text-slate-700"><strong>職責：</strong> ${assignment.duty}</div>` : ''}
           </div>
           ${assignment && assignment.mapUrl ? `
-            <a href="${assignment.mapUrl}" target="_blank" class="block text-center btn-orange font-bold py-2 rounded-xl text-xs">
-              🗺️ 開啟 Google Maps 定點導航 ↗
-            </a>
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button onclick="openEmbeddedMap('${assignment.pointId}', '${assignment.pointLabel}', '${assignment.mapUrl}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-xl text-xs">
+                👁️ 地圖預覽
+              </button>
+              <a href="${assignment.mapUrl}" target="_blank" class="block text-center btn-orange font-bold py-2 rounded-xl text-xs">
+                🗺️ App 導航 ↗
+              </a>
+            </div>
           ` : ''}
         `;
       } else {
@@ -2001,7 +2383,7 @@
       document.getElementById("imgPreviewWrapper").classList.add("hidden");
     }
 
-    // 送出打卡 (標記 event: "dancup"，後端自動存入 DanCup 分頁)
+    // 送出打卡 (標記 event: "dancup")
     async function handleCheckInSubmit(e) {
       e.preventDefault();
       const userName = document.getElementById("volunteerName").value;
@@ -2022,7 +2404,7 @@
       btnText.textContent = "上傳資料與照片至 DanCup 分頁中...";
 
       const payload = {
-        event: "dancup", // 關鍵標記：自動路由至 DanCup 獨立分頁
+        event: "dancup",
         userName,
         pointId,
         lat: currentLat || "",
@@ -2081,9 +2463,10 @@
         const resJson = await res.json();
         if (resJson.status === "success" && Array.isArray(resJson.data)) {
           onlineDataCache = resJson.data;
-          renderStationsBoard();
+          renderLinesAccordion();
           renderRoster();
           renderPhotoWall(onlineDataCache);
+          updateMapMarkers();
           updateSyncStatusUI('online', onlineDataCache.length);
         }
       } catch (e) {
@@ -2113,7 +2496,6 @@
       }
     }
 
-    // 照片牆
     function renderPhotoWall(records) {
       const container = document.getElementById("checkInRecordList");
       const badge = document.getElementById("checkedInCountBadge");
@@ -2174,7 +2556,6 @@
       alert("正在刷新 Dan Cup 最新雲端資料...");
     }
 
-    // 管理員登入
     function checkAdminStatus() {
       const isAdmin = sessionStorage.getItem("is_admin") === "true";
       const loginBtn = document.getElementById("loginBtn");
@@ -2220,6 +2601,8 @@
     }
 
     function openLoginModal() {
+      document.getElementById("loginUser").value = "";
+      document.getElementById("loginPass").value = "";
       document.getElementById("loginModal").classList.remove("hidden");
     }
     function closeLoginModal() {
