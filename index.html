@@ -227,32 +227,58 @@
     </section>
 
     <!-- ================= 賽事時程與地圖導航 ================= -->
-    <section class="card-base p-4 text-xs space-y-2.5">
+    <!-- ================= 🗺️ 賽事兩大路線指引 (上下明確標示) ================= -->
+    <section class="card-base p-4 text-xs space-y-3">
       <div class="flex items-center justify-between border-b border-blue-100 pb-2">
-        <span class="font-black text-[#004B97] flex items-center text-sm">
-          <svg class="w-4 h-4 mr-1 text-[#004B97]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          賽事勤務與路線指引
-        </span>
-        <span class="text-[11px] bg-blue-100 text-[#004B97] font-bold px-2 py-0.5 rounded-full">10/03 清晨 04:00 集合</span>
+        <div>
+          <span class="font-black text-[#004B97] flex items-center text-sm">
+            <svg class="w-4 h-4 mr-1 text-[#004B97]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+            賽事兩大路線導航（上下分段說明）
+          </span>
+          <p class="text-[10px] text-[#5b7290] mt-0.5">
+            💡 現場口訣：04:00 埔里出發點【上面】，抵達港源國小開始放人點【下面】！
+          </p>
+        </div>
+        <span class="text-[11px] bg-blue-100 text-[#004B97] font-bold px-2 py-0.5 rounded-full shrink-0 ml-1">10/03 清晨出發</span>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        <a href="https://maps.app.goo.gl/3WyY65MER5ZxGkHf6" target="_blank" class="block p-3 rounded-xl bg-[#F0F8FF] hover:bg-blue-100/60 border border-blue-200/60 transition active:scale-98">
-          <div class="flex items-center justify-between text-[#004B97] font-bold mb-1">
-            <span>① 集合 ➔ 前往放人起點</span>
-            <span class="text-[10px] bg-[#004B97] text-white px-1.5 py-0.2 rounded-full font-bold">路線圖 ↗</span>
+      <div class="space-y-2.5">
+        <!-- 【上面】第一段：集合後前往起點 -->
+        <a href="https://maps.app.goo.gl/3WyY65MER5ZxGkHf6" target="_blank" class="block p-3.5 rounded-xl bg-[#F0F8FF] hover:bg-blue-100/70 border-2 border-blue-200/80 shadow-xs transition active:scale-98">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="bg-[#004B97] text-white font-black text-xs px-2.5 py-0.5 rounded-md flex items-center shadow-xs">
+              ⬆️ 上面這個：【第一階段 · 集合出發路線】
+            </span>
+            <span class="text-[11px] font-bold text-[#004B97] underline flex items-center">
+              開啟導航 ↗
+            </span>
           </div>
-          <p class="text-[#0F2745]">🚩 <strong>集合：</strong> 埔里瀛海城隍廟</p>
-          <p class="text-[#5b7290] mt-0.5">抵達：國姓鄉港源國小（147線起點）</p>
+          <div class="space-y-0.5 text-[#0F2745] pl-0.5">
+            <p class="font-bold text-xs">🚩 埔里瀛海城隍廟 ➔ 國姓鄉港源國小 (147線起點)</p>
+            <p class="text-[#5b7290] text-[11px]">清晨 04:00 城隍廟集合完畢後，跟車騎至放人出發點，尚未開始放人。</p>
+          </div>
+          <div class="mt-2 text-center bg-[#004B97] text-white font-bold py-1.5 rounded-lg text-xs hover:bg-[#003a75] transition">
+            🗺️ 點此開啟【出發移動路線】Google Maps 導航 ↗
+          </div>
         </a>
 
-        <a href="https://maps.app.goo.gl/hHcujPW74qMyqZr18" target="_blank" class="block p-3 rounded-xl bg-emerald-50/70 hover:bg-emerald-100/60 border border-emerald-200/60 transition active:scale-98">
-          <div class="flex items-center justify-between text-emerald-800 font-bold mb-1">
-            <span>② 147 縣道放人路段</span>
-            <span class="text-[10px] bg-emerald-600 text-white px-1.5 py-0.2 rounded-full font-bold">部署路線 ↗</span>
+        <!-- 【下面】第二段：147縣道開始放10人 -->
+        <a href="https://maps.app.goo.gl/hHcujPW74qMyqZr18" target="_blank" class="block p-3.5 rounded-xl bg-emerald-50/80 hover:bg-emerald-100/80 border-2 border-emerald-300 shadow-xs transition active:scale-98">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="bg-emerald-700 text-white font-black text-xs px-2.5 py-0.5 rounded-md flex items-center shadow-xs">
+              ⬇️ 下面這個：【第二階段 · 147線開始放人部署】
+            </span>
+            <span class="text-[11px] font-bold text-emerald-800 underline flex items-center">
+              開啟路線 ↗
+            </span>
           </div>
-          <p class="text-[#0F2745]">🏁 <strong>範圍：</strong> 港源國小 ➔ 水里興民宮</p>
-          <p class="text-emerald-700 mt-0.5">沿線約 8.5 km，各路口放置 10 員</p>
+          <div class="space-y-0.5 text-[#0F2745] pl-0.5">
+            <p class="font-bold text-xs text-emerald-950">🏁 港源國小 ➔ 水里新興村興民宮 (開始放 10 人站崗)</p>
+            <p class="text-emerald-800 text-[11px]">沿 147 縣道約 8.5 km，沿途各路口邊騎邊放 10 位交管志工！</p>
+          </div>
+          <div class="mt-2 text-center bg-emerald-600 text-white font-bold py-1.5 rounded-lg text-xs hover:bg-emerald-700 transition">
+            🗺️ 點此開啟【147縣道放人】Google Maps 部署路線 ↗
+          </div>
         </a>
       </div>
     </section>
