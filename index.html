@@ -162,217 +162,25 @@
       </div>
     </section>
 
-    <!-- ================= 📊 雲端連線狀態與離線資料保全看板 ================= -->
-    <section class="card-base p-3 bg-gradient-to-r from-blue-50/80 via-white to-emerald-50/80 border-blue-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs shadow-xs">
-      <div class="flex items-center space-x-2">
-        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800" id="syncStatusTag">
-          🟢 資料已同步
-        </span>
-        <span class="text-[#5b7290] text-[11px]" id="syncTimeText">
-          最後更新：載入中...
-        </span>
-      </div>
-      <div class="flex items-center space-x-2">
-        <button type="button" onclick="exportDataBackup()" class="text-[11px] bg-white hover:bg-slate-50 text-slate-700 font-bold px-2.5 py-1 rounded-lg border border-slate-200 flex items-center transition shadow-xs active:scale-95" title="匯出打卡紀錄與相片備份">
-          📥 匯出備份 (JSON)
-        </button>
-        <button type="button" onclick="refreshData()" class="text-[11px] bg-[#004B97] hover:bg-[#003a75] text-white font-bold px-2.5 py-1 rounded-lg flex items-center transition shadow-xs active:scale-95">
-          <svg id="syncRefreshIcon" class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-          立即更新
-        </button>
-      </div>
-    </section>
+        <!-- ================= 🔀 雙視角切換器 (志工打卡執勤 vs 指揮官全盤看板) ================= -->
+    <div class="sticky top-14 z-30 bg-slate-100/95 backdrop-blur-md p-1.5 rounded-2xl border border-blue-200/90 shadow-sm flex items-center gap-1.5">
+      <button type="button" id="tabBtnVolunteer" onclick="switchViewMode('volunteer')" class="flex-1 py-2.5 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center transition active:scale-98 shadow-xs bg-[#004B97] text-white">
+        <span class="mr-1.5 text-base">🚴</span>
+        <span>志工打卡執勤</span>
+        <span class="ml-1 text-[10px] font-normal opacity-85 hidden sm:inline">(個人簡約)</span>
+      </button>
+      <button type="button" id="tabBtnCommander" onclick="switchViewMode('commander')" class="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center transition active:scale-98 text-[#0F2745] hover:bg-white/80">
+        <span class="mr-1.5 text-base">🗺️</span>
+        <span>指揮官全盤看板</span>
+        <span class="ml-1 text-[10px] font-normal opacity-75 hidden sm:inline">(10站/名冊/照片)</span>
+      </button>
+    </div>
 
-    <!-- ================= 📲 Velodash 實時賽況追蹤 ＆ 🎥 全球直播執勤守則 ================= -->
-    <section class="card-base p-4 border-blue-200/80 bg-gradient-to-br from-white via-blue-50/30 to-emerald-50/30 space-y-3">
-      <!-- Velodash App 追蹤 -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-blue-100">
-        <div>
-          <div class="flex items-center space-x-1.5">
-            <span class="text-base">📲</span>
-            <h3 class="font-black text-sm text-[#004B97]">Velodash 實時賽況位置 (觀賽模式)</h3>
-          </div>
-          <p class="text-[11px] text-[#5b7290] mt-0.5">
-            點擊開啟 App 觀賽模式，即可精準掌握<strong>最前鋒領先集團</strong>與<strong>最後方尾車</strong>位置！
-          </p>
-        </div>
-        <a href="https://velodash.page.link/eKJ3" target="_blank" class="inline-flex items-center justify-center bg-[#004B97] hover:bg-[#003a75] text-white font-black px-4 py-2 rounded-xl text-xs shadow-sm active:scale-95 transition whitespace-nowrap">
-          <span>開啟 Velodash 追蹤 ↗</span>
-        </a>
-      </div>
-
-      <!-- 全球直播執勤形象守則 -->
-      <div class="space-y-2 text-xs">
-        <div class="flex items-center justify-between">
-          <span class="font-black text-rose-700 flex items-center text-xs">
-            <span class="mr-1">🎥</span> 全球直播執勤形象守則
-          </span>
-          <span class="text-[10px] bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded-full">今年全球直播</span>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
-          <div class="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-950 font-bold flex items-start space-x-2">
-            <span class="text-base leading-none">🚩</span>
-            <div>
-              <span class="text-[#004B97]">車隊通過路口時：</span>
-              請務必站立並<strong>全力揮舞旗子指引方向</strong>！
-            </div>
-          </div>
-          <div class="p-2.5 rounded-xl bg-white border border-blue-100 text-[#0F2745] flex items-start space-x-2">
-            <span class="text-base leading-none">🦟</span>
-            <div>
-              <span class="font-bold text-[#004B97]">防蚊提醒：</span>
-              沿線範圍小黑蚊極多，建議盡量穿長褲防叮咬。
-            </div>
-          </div>
-          <div class="p-2.5 rounded-xl bg-white border border-blue-100 text-[#0F2745] flex items-start space-x-2">
-            <span class="text-base leading-none">📵</span>
-            <div>
-              <span class="font-bold text-rose-600">勿滑手機：</span>
-              車隊通過時切勿低頭滑手機，保持專注警戒。
-            </div>
-          </div>
-          <div class="p-2.5 rounded-xl bg-white border border-blue-100 text-[#0F2745] flex items-start space-x-2">
-            <span class="text-base leading-none">🚭</span>
-            <div>
-              <span class="font-bold text-rose-600">全面禁菸：</span>
-              執勤期間維護國際賽事形象，嚴禁吸菸。
-            </div>
-          </div>
-        </div>
-
-        <div class="p-2 rounded-lg bg-blue-50/80 border border-blue-200/60 text-[#004B97] text-[11px] leading-relaxed">
-          🛡️ <strong>核心任務：</strong>在路口引導參賽者進入正式賽道，並提前勸導當地一般用路人減速靠邊行駛。
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= 賽事時程與地圖導航 ================= -->
-    <!-- ================= 🗺️ 賽事兩大路線指引 (上下明確標示) ================= -->
-    <section class="card-base p-4 text-xs space-y-3">
-      <div class="flex items-center justify-between border-b border-blue-100 pb-2">
-        <div>
-          <span class="font-black text-[#004B97] flex items-center text-sm">
-            <svg class="w-4 h-4 mr-1 text-[#004B97]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
-            賽事兩大路線導航（上下分段說明）
-          </span>
-          <p class="text-[10px] text-[#5b7290] mt-0.5">
-            💡 現場口訣：04:00 埔里出發點【上面】，抵達港源國小開始放人點【下面】！
-          </p>
-        </div>
-        <span class="text-[11px] bg-blue-100 text-[#004B97] font-bold px-2 py-0.5 rounded-full shrink-0 ml-1">10/03 清晨出發</span>
-      </div>
-
-      <div class="space-y-2.5">
-        <!-- 【上面】第一段：集合後前往起點 -->
-        <a href="https://maps.app.goo.gl/3WyY65MER5ZxGkHf6" target="_blank" class="block p-3.5 rounded-xl bg-[#F0F8FF] hover:bg-blue-100/70 border-2 border-blue-200/80 shadow-xs transition active:scale-98">
-          <div class="flex items-center justify-between mb-1.5">
-            <span class="bg-[#004B97] text-white font-black text-xs px-2.5 py-0.5 rounded-md flex items-center shadow-xs">
-              ⬆️ 上面這個：【第一階段 · 集合出發路線】
-            </span>
-            <span class="text-[11px] font-bold text-[#004B97] underline flex items-center">
-              開啟導航 ↗
-            </span>
-          </div>
-          <div class="space-y-0.5 text-[#0F2745] pl-0.5">
-            <p class="font-bold text-xs">🚩 埔里瀛海城隍廟 ➔ 國姓鄉港源國小 (147線起點)</p>
-            <p class="text-[#5b7290] text-[11px]">清晨 04:00 城隍廟集合完畢後，跟車騎至放人出發點，尚未開始放人。</p>
-          </div>
-          <div class="mt-2 text-center bg-[#004B97] text-white font-bold py-1.5 rounded-lg text-xs hover:bg-[#003a75] transition">
-            🗺️ 點此開啟【出發移動路線】Google Maps 導航 ↗
-          </div>
-        </a>
-
-        <!-- 【下面】第二段：147縣道開始放10人 -->
-        <a href="https://maps.app.goo.gl/hHcujPW74qMyqZr18" target="_blank" class="block p-3.5 rounded-xl bg-emerald-50/80 hover:bg-emerald-100/80 border-2 border-emerald-300 shadow-xs transition active:scale-98">
-          <div class="flex items-center justify-between mb-1.5">
-            <span class="bg-emerald-700 text-white font-black text-xs px-2.5 py-0.5 rounded-md flex items-center shadow-xs">
-              ⬇️ 下面這個：【第二階段 · 147線開始放人部署】
-            </span>
-            <span class="text-[11px] font-bold text-emerald-800 underline flex items-center">
-              開啟路線 ↗
-            </span>
-          </div>
-          <div class="space-y-0.5 text-[#0F2745] pl-0.5">
-            <p class="font-bold text-xs text-emerald-950">🏁 港源國小 ➔ 水里新興村興民宮 (開始放 10 人站崗)</p>
-            <p class="text-emerald-800 text-[11px]">沿 147 縣道約 8.5 km，沿途各路口邊騎邊放 10 位交管志工！</p>
-          </div>
-          <div class="mt-2 text-center bg-emerald-600 text-white font-bold py-1.5 rounded-lg text-xs hover:bg-emerald-700 transition">
-            🗺️ 點此開啟【147縣道放人】Google Maps 部署路線 ↗
-          </div>
-        </a>
-
-        <!-- 【掃把收尾與撤哨指引】 -->
-        <div class="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/80 space-y-2 text-[#0F2745]">
-          <div class="flex items-center justify-between">
-            <span class="font-black text-xs text-amber-900 flex items-center">
-              <span class="mr-1">🧹</span>
-              什麼是「掃把」？撤哨與人員回收須知
-            </span>
-            <span class="text-[10px] bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded">
-              必看安全須知
-            </span>
-          </div>
-          <p class="text-[11px] text-amber-950 leading-relaxed">
-            單車活動與賽事的「掃把」即<strong>壓尾裁判 / 關門收尾車 (Broom Wagon)</strong>，負責賽道最後一位選手的壓尾護航、沿線器材清潔與人員安全撤收：
-          </p>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] pt-0.5">
-            <div class="bg-white/80 p-2 rounded-lg border border-amber-200/60">
-              <strong class="text-amber-900">① 辨識關門車輛：</strong>
-              見到大會壓尾「掃把車」與裁判通過，即代表該路段賽事正式結束。
-            </div>
-            <div class="bg-white/80 p-2 rounded-lg border border-amber-200/60">
-              <strong class="text-amber-900">② 等候專車收回：</strong>
-              主辦單位備有專車自水里往回逐點「收收收」工作人員回埔里，<strong>切勿擅自脫崗離開</strong>。
-            </div>
-            <div class="bg-white/80 p-2 rounded-lg border border-amber-200/60 sm:col-span-2">
-              <strong class="text-amber-900">③ 賽道清潔與物資回收：</strong>
-              現場若有賽道警示繩、指標布條或安全角錐，由掃把與撤哨組沿路完整拆除回收，落實無痕山林。
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= 📍 147 縣道 10 大站點即時部署與管制指引 (P01~P10) ================= -->
-    <section class="card-base p-4">
-      <div class="flex items-center justify-between mb-3 border-b border-blue-100 pb-2">
-        <div>
-          <h3 class="text-xs font-black text-[#004B97] flex items-center">
-            <span class="text-base mr-1.5">📍</span>
-            147 縣道 10 大站點部署表 (P01 ~ P10)
-          </h3>
-          <p class="text-[10px] text-[#5b7290]">即時掌握每個路口管制重點、分配志工與就位狀況</p>
-        </div>
-        <button onclick="openManagePointsModal()" class="text-[11px] bg-blue-100 hover:bg-blue-200 text-[#004B97] border border-blue-300 font-bold px-2.5 py-1 rounded-lg flex items-center transition shadow-xs">
-          ✏️ 編輯站點名稱
-        </button>
-      </div>
-
-      <div class="space-y-2.5" id="stationsBoardList">
-        <!-- 動態由 JS 渲染 10 個站點卡片 -->
-      </div>
-    </section>
-
-    <!-- ================= 👥 交管人員出勤名冊 (點擊卡片直接查看該員照片與定位！) ================= -->
-    <section class="card-base p-4">
-      <div class="flex items-center justify-between mb-3 border-b border-blue-100 pb-2">
-        <div>
-          <h3 class="text-xs font-black text-[#004B97] flex items-center">
-            <svg class="w-4 h-4 mr-1 text-[#004B97]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-            交管出勤名冊 (共 11 員)
-          </h3>
-          <p class="text-[10px] text-[#5b7290]">💡 點擊任何人員卡片，即可查看其現場照片與 GPS 位置</p>
-        </div>
-        <span class="text-[11px] text-[#004B97] font-bold" id="rosterStatusCount">就位進度：載入中...</span>
-      </div>
-
-      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="rosterList">
-        <!-- 動態產生可點擊查看照片的名冊卡片 -->
-      </div>
-    </section>
-
-    <!-- ================= 核心操作：現場放人打卡 ＆ GPS 座標回報 ================= -->
+    <!-- ========================================================
+         視角一：🚴 志工打卡執勤專用區塊 (聚焦個人任務、無多餘資訊)
+         ======================================================== -->
+    <div id="viewVolunteerWrapper" class="space-y-4">
+<!-- ================= 核心操作：現場放人打卡 ＆ GPS 座標回報 ================= -->
     <section class="card-base p-4 border-2 border-blue-200/80 shadow-md">
       <div class="flex items-center justify-between mb-3 border-b border-blue-100 pb-2">
         <h2 class="font-black text-sm sm:text-base text-[#004B97] flex items-center">
@@ -486,7 +294,161 @@
       </div>
     </section>
 
-    <!-- ================= 💬 會場常見問題 QA 速查 (應對路人/選手詢問) ================= -->
+    
+<!-- ================= 📲 Velodash 實時賽況追蹤 ＆ 🎥 全球直播執勤守則 ================= -->
+    <section class="card-base p-4 border-blue-200/80 bg-gradient-to-br from-white via-blue-50/30 to-emerald-50/30 space-y-3">
+      <!-- Velodash App 追蹤 -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-blue-100">
+        <div>
+          <div class="flex items-center space-x-1.5">
+            <span class="text-base">📲</span>
+            <h3 class="font-black text-sm text-[#004B97]">Velodash 實時賽況位置 (觀賽模式)</h3>
+          </div>
+          <p class="text-[11px] text-[#5b7290] mt-0.5">
+            點擊開啟 App 觀賽模式，即可精準掌握<strong>最前鋒領先集團</strong>與<strong>最後方尾車</strong>位置！
+          </p>
+        </div>
+        <a href="https://velodash.page.link/eKJ3" target="_blank" class="inline-flex items-center justify-center bg-[#004B97] hover:bg-[#003a75] text-white font-black px-4 py-2 rounded-xl text-xs shadow-sm active:scale-95 transition whitespace-nowrap">
+          <span>開啟 Velodash 追蹤 ↗</span>
+        </a>
+      </div>
+
+      <!-- 全球直播執勤形象守則 -->
+      <div class="space-y-2 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="font-black text-rose-700 flex items-center text-xs">
+            <span class="mr-1">🎥</span> 全球直播執勤形象守則
+          </span>
+          <span class="text-[10px] bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded-full">今年全球直播</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+          <div class="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-950 font-bold flex items-start space-x-2">
+            <span class="text-base leading-none">🚩</span>
+            <div>
+              <span class="text-[#004B97]">車隊通過路口時：</span>
+              請務必站立並<strong>全力揮舞旗子指引方向</strong>！
+            </div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-white border border-blue-100 text-[#0F2745] flex items-start space-x-2">
+            <span class="text-base leading-none">🦟</span>
+            <div>
+              <span class="font-bold text-[#004B97]">防蚊提醒：</span>
+              沿線範圍小黑蚊極多，建議盡量穿長褲防叮咬。
+            </div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-white border border-blue-100 text-[#0F2745] flex items-start space-x-2">
+            <span class="text-base leading-none">📵</span>
+            <div>
+              <span class="font-bold text-rose-600">勿滑手機：</span>
+              車隊通過時切勿低頭滑手機，保持專注警戒。
+            </div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-white border border-blue-100 text-[#0F2745] flex items-start space-x-2">
+            <span class="text-base leading-none">🚭</span>
+            <div>
+              <span class="font-bold text-rose-600">全面禁菸：</span>
+              執勤期間維護國際賽事形象，嚴禁吸菸。
+            </div>
+          </div>
+        </div>
+
+        <div class="p-2 rounded-lg bg-blue-50/80 border border-blue-200/60 text-[#004B97] text-[11px] leading-relaxed">
+          🛡️ <strong>核心任務：</strong>在路口引導參賽者進入正式賽道，並提前勸導當地一般用路人減速靠邊行駛。
+        </div>
+      </div>
+    </section>
+
+    
+<!-- ================= 賽事時程與地圖導航 ================= -->
+    <!-- ================= 🗺️ 賽事兩大路線指引 (上下明確標示) ================= -->
+    <section class="card-base p-4 text-xs space-y-3">
+      <div class="flex items-center justify-between border-b border-blue-100 pb-2">
+        <div>
+          <span class="font-black text-[#004B97] flex items-center text-sm">
+            <svg class="w-4 h-4 mr-1 text-[#004B97]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+            賽事兩大路線導航（上下分段說明）
+          </span>
+          <p class="text-[10px] text-[#5b7290] mt-0.5">
+            💡 現場口訣：04:00 埔里出發點【上面】，抵達港源國小開始放人點【下面】！
+          </p>
+        </div>
+        <span class="text-[11px] bg-blue-100 text-[#004B97] font-bold px-2 py-0.5 rounded-full shrink-0 ml-1">10/03 清晨出發</span>
+      </div>
+
+      <div class="space-y-2.5">
+        <!-- 【上面】第一段：集合後前往起點 -->
+        <a href="https://maps.app.goo.gl/3WyY65MER5ZxGkHf6" target="_blank" class="block p-3.5 rounded-xl bg-[#F0F8FF] hover:bg-blue-100/70 border-2 border-blue-200/80 shadow-xs transition active:scale-98">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="bg-[#004B97] text-white font-black text-xs px-2.5 py-0.5 rounded-md flex items-center shadow-xs">
+              ⬆️ 上面這個：【第一階段 · 集合出發路線】
+            </span>
+            <span class="text-[11px] font-bold text-[#004B97] underline flex items-center">
+              開啟導航 ↗
+            </span>
+          </div>
+          <div class="space-y-0.5 text-[#0F2745] pl-0.5">
+            <p class="font-bold text-xs">🚩 埔里瀛海城隍廟 ➔ 國姓鄉港源國小 (147線起點)</p>
+            <p class="text-[#5b7290] text-[11px]">清晨 04:00 城隍廟集合完畢後，跟車騎至放人出發點，尚未開始放人。</p>
+          </div>
+          <div class="mt-2 text-center bg-[#004B97] text-white font-bold py-1.5 rounded-lg text-xs hover:bg-[#003a75] transition">
+            🗺️ 點此開啟【出發移動路線】Google Maps 導航 ↗
+          </div>
+        </a>
+
+        <!-- 【下面】第二段：147縣道開始放10人 -->
+        <a href="https://maps.app.goo.gl/hHcujPW74qMyqZr18" target="_blank" class="block p-3.5 rounded-xl bg-emerald-50/80 hover:bg-emerald-100/80 border-2 border-emerald-300 shadow-xs transition active:scale-98">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="bg-emerald-700 text-white font-black text-xs px-2.5 py-0.5 rounded-md flex items-center shadow-xs">
+              ⬇️ 下面這個：【第二階段 · 147線開始放人部署】
+            </span>
+            <span class="text-[11px] font-bold text-emerald-800 underline flex items-center">
+              開啟路線 ↗
+            </span>
+          </div>
+          <div class="space-y-0.5 text-[#0F2745] pl-0.5">
+            <p class="font-bold text-xs text-emerald-950">🏁 港源國小 ➔ 水里新興村興民宮 (開始放 10 人站崗)</p>
+            <p class="text-emerald-800 text-[11px]">沿 147 縣道約 8.5 km，沿途各路口邊騎邊放 10 位交管志工！</p>
+          </div>
+          <div class="mt-2 text-center bg-emerald-600 text-white font-bold py-1.5 rounded-lg text-xs hover:bg-emerald-700 transition">
+            🗺️ 點此開啟【147縣道放人】Google Maps 部署路線 ↗
+          </div>
+        </a>
+
+        <!-- 【掃把收尾與撤哨指引】 -->
+        <div class="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/80 space-y-2 text-[#0F2745]">
+          <div class="flex items-center justify-between">
+            <span class="font-black text-xs text-amber-900 flex items-center">
+              <span class="mr-1">🧹</span>
+              什麼是「掃把」？撤哨與人員回收須知
+            </span>
+            <span class="text-[10px] bg-amber-200 text-amber-900 font-bold px-1.5 py-0.5 rounded">
+              必看安全須知
+            </span>
+          </div>
+          <p class="text-[11px] text-amber-950 leading-relaxed">
+            單車活動與賽事的「掃把」即<strong>壓尾裁判 / 關門收尾車 (Broom Wagon)</strong>，負責賽道最後一位選手的壓尾護航、沿線器材清潔與人員安全撤收：
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] pt-0.5">
+            <div class="bg-white/80 p-2 rounded-lg border border-amber-200/60">
+              <strong class="text-amber-900">① 辨識關門車輛：</strong>
+              見到大會壓尾「掃把車」與裁判通過，即代表該路段賽事正式結束。
+            </div>
+            <div class="bg-white/80 p-2 rounded-lg border border-amber-200/60">
+              <strong class="text-amber-900">② 等候專車收回：</strong>
+              主辦單位備有專車自水里往回逐點「收收收」工作人員回埔里，<strong>切勿擅自脫崗離開</strong>。
+            </div>
+            <div class="bg-white/80 p-2 rounded-lg border border-amber-200/60 sm:col-span-2">
+              <strong class="text-amber-900">③ 賽道清潔與物資回收：</strong>
+              現場若有賽道警示繩、指標布條或安全角錐，由掃把與撤哨組沿路完整拆除回收，落實無痕山林。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    
+<!-- ================= 💬 會場常見問題 QA 速查 (應對路人/選手詢問) ================= -->
     <section class="card-base p-4 space-y-3">
       <div class="flex items-center justify-between border-b border-blue-100 pb-2">
         <div>
@@ -605,7 +567,76 @@
       </div>
     </section>
 
-    <!-- ================= 📸 即時現場照片與打卡動態牆 ================= -->
+    
+    </div>
+
+    <!-- ========================================================
+         視角二：🗺️ 指揮官全盤看板區塊 (掌握 10 站部署、名冊、即時相片牆)
+         ======================================================== -->
+    <div id="viewCommanderWrapper" class="space-y-4 hidden">
+<!-- ================= 📊 雲端連線狀態與離線資料保全看板 ================= -->
+    <section class="card-base p-3 bg-gradient-to-r from-blue-50/80 via-white to-emerald-50/80 border-blue-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs shadow-xs">
+      <div class="flex items-center space-x-2">
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800" id="syncStatusTag">
+          🟢 資料已同步
+        </span>
+        <span class="text-[#5b7290] text-[11px]" id="syncTimeText">
+          最後更新：載入中...
+        </span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button type="button" onclick="exportDataBackup()" class="text-[11px] bg-white hover:bg-slate-50 text-slate-700 font-bold px-2.5 py-1 rounded-lg border border-slate-200 flex items-center transition shadow-xs active:scale-95" title="匯出打卡紀錄與相片備份">
+          📥 匯出備份 (JSON)
+        </button>
+        <button type="button" onclick="refreshData()" class="text-[11px] bg-[#004B97] hover:bg-[#003a75] text-white font-bold px-2.5 py-1 rounded-lg flex items-center transition shadow-xs active:scale-95">
+          <svg id="syncRefreshIcon" class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          立即更新
+        </button>
+      </div>
+    </section>
+
+    
+<!-- ================= 📍 147 縣道 10 大站點即時部署與管制指引 (P01~P10) ================= -->
+    <section class="card-base p-4">
+      <div class="flex items-center justify-between mb-3 border-b border-blue-100 pb-2">
+        <div>
+          <h3 class="text-xs font-black text-[#004B97] flex items-center">
+            <span class="text-base mr-1.5">📍</span>
+            147 縣道 10 大站點部署表 (P01 ~ P10)
+          </h3>
+          <p class="text-[10px] text-[#5b7290]">即時掌握每個路口管制重點、分配志工與就位狀況</p>
+        </div>
+        <button onclick="openManagePointsModal()" class="text-[11px] bg-blue-100 hover:bg-blue-200 text-[#004B97] border border-blue-300 font-bold px-2.5 py-1 rounded-lg flex items-center transition shadow-xs">
+          ✏️ 編輯點位與到達方式
+        </button>
+      </div>
+
+      <div class="space-y-2.5" id="stationsBoardList">
+        <!-- 動態由 JS 渲染 10 個站點卡片 -->
+      </div>
+    </section>
+
+    
+<!-- ================= 👥 交管人員出勤名冊 (點擊卡片直接查看該員照片與定位！) ================= -->
+    <section class="card-base p-4">
+      <div class="flex items-center justify-between mb-3 border-b border-blue-100 pb-2">
+        <div>
+          <h3 class="text-xs font-black text-[#004B97] flex items-center">
+            <svg class="w-4 h-4 mr-1 text-[#004B97]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            交管出勤名冊 (共 11 員)
+          </h3>
+          <p class="text-[10px] text-[#5b7290]">💡 點擊任何人員卡片，即可查看其現場照片與 GPS 位置</p>
+        </div>
+        <span class="text-[11px] text-[#004B97] font-bold" id="rosterStatusCount">就位進度：載入中...</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="rosterList">
+        <!-- 動態產生可點擊查看照片的名冊卡片 -->
+      </div>
+    </section>
+
+    
+<!-- ================= 📸 即時現場照片與打卡動態牆 ================= -->
     <section class="card-base p-4">
       <div class="flex items-center justify-between mb-3 border-b border-blue-100 pb-2">
         <div>
@@ -627,13 +658,16 @@
       </div>
     </section>
 
+    
+    </div>
+
     <!-- ================= 🏓 頁尾 (NCHU 匹克球運動科技實驗室) ================= -->
     <footer class="pt-6 pb-12 text-center space-y-2 border-t border-blue-200/60 mt-6">
       <div class="text-xs text-[#5b7290] flex items-center justify-center flex-wrap gap-1">
         <span>本網頁由</span>
         <span class="font-bold text-[#004B97]">國立中興大學 匹克球運動科技實驗室</span>
         <span>建立</span>
-        <span class="bg-blue-100 text-[#004B97] text-[10px] font-black px-1.5 py-0.5 rounded">v1.4.0 離線保全版</span>
+        <span class="bg-blue-100 text-[#004B97] text-[10px] font-black px-1.5 py-0.5 rounded">v1.5.0 雙視角導航版</span>
       </div>
       <div>
         <a href="https://kalmangoose.github.io/nchu-pickleball-recruit/index.html" 
@@ -813,18 +847,18 @@
     // 帳密驗證 SHA-256 Hash
     const AUTH_HASH = "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3";
 
-    // 預設 P1 ~ P10 站點名稱與詳細管制註解
+    // 預設 P1 ~ P10 站點名稱、前往到達方式與管制註解
     const DEFAULT_POINTS_CONFIG = [
-      { id: "P01", label: "港源起點", note: "國姓鄉港源國小校門口，管制港頭巷農車橫越，引導選手靠右進入縣道147主線" },
-      { id: "P02", label: "前段叉路/一號橋", note: "港源一號橋前農路岔路口，阻擋右側便道農用車輛匯入" },
-      { id: "P03", label: "中段上坡彎道", note: "縣道147約6K處農路口，連續上坡盲彎，揮旗警示對向來車減速靠邊" },
-      { id: "P04", label: "二號橋狹窄處", note: "二號橋橋頭，路幅明顯縮減，吹哨示警引導單車依序靠右通過" },
-      { id: "P05", label: "越嶺高點/分水嶺", note: "國姓水里交界最高點界碑，極重要：即將進入長陡下坡，提醒減速握下把" },
-      { id: "P06", label: "下坡急彎 1", note: "水里端連續下坡第1個大髮夾盲彎，揮旗示警，防範對向車輛越線" },
-      { id: "P07", label: "下坡急彎 2", note: "新興村上段陡坡盲彎，引導靠右下坡，注意路側碎石" },
-      { id: "P08", label: "新興聚落十字路", note: "新興國小旁社區聚落十字路口，阻隔聚落機車行人橫越" },
-      { id: "P09", label: "水里興民宮/131線", note: "縣道147終點接131線興民宮前，極重要：匯入主幹道前全向交管阻隔主線外車" },
-      { id: "P10", label: "水里備援路口", note: "水里端沿線機動備援點位" }
+      { id: "P01", label: "港源起點", reach: "國姓鄉 147 縣道 0K 起點，港源國小校門正前方", note: "國姓鄉港源國小校門口，管制港頭巷農車橫越，引導選手靠右進入縣道147主線" },
+      { id: "P02", label: "前段叉路/一號橋", reach: "港源國小沿主線前行 1.2K，港源一號橋頭右側農路叉口", note: "港源一號橋前農路岔路口，阻擋右側便道農用車輛匯入" },
+      { id: "P03", label: "中段上坡彎道", reach: "147 縣道約 6K 處連續上坡盲彎，右側農路叉口（林道碎石路況請放慢）", note: "縣道147約6K處農路口，連續上坡盲彎，揮旗警示對向來車減速靠邊" },
+      { id: "P04", label: "二號橋狹窄處", reach: "147 縣道 7.3K 二號橋橋頭（路幅收窄處，機車靠右停放）", note: "二號橋橋頭，路幅明顯縮減，吹哨示警引導單車依序靠右通過" },
+      { id: "P05", label: "越嶺高點/分水嶺", reach: "147 縣道最高點，國姓/水里交界分水嶺界碑旁（越嶺後為長陡下坡）", note: "國姓水里交界最高點界碑，極重要：即將進入長陡下坡，提醒減速握下把" },
+      { id: "P06", label: "下坡急彎 1", reach: "水里端下坡約 800m，過盲彎後第 1 個大髮夾彎道避車處", note: "水里端連續下坡第1個大髮夾盲彎，揮旗示警，防範對向車輛越線" },
+      { id: "P07", label: "下坡急彎 2", reach: "水里鄉新興村上段，連續急下坡盲彎路段路側空地", note: "新興村上段陡坡盲彎，引導靠右下坡，注意路側碎石" },
+      { id: "P08", label: "新興聚落十字路", reach: "水里鄉新興國小旁，社區主要聚落十字交叉路口", note: "新興國小旁社區聚落十字路口，阻隔聚落機車行人橫越" },
+      { id: "P09", label: "水里興民宮/131線", reach: "147 縣道終點銜接 131 縣道丁字路口，興民宮牌樓前廣場", note: "縣道147終點接131線興民宮前，極重要：匯入主幹道前全向交管阻隔主線外車" },
+      { id: "P10", label: "水里備援路口", reach: "水里端 131 線沿線機動備援節點", note: "水里端沿線機動備援點位" }
     ];
 
     // 今日實戰打卡真實資料快照 (內建種子快取，即使在山區零訊號、飛航模式開啟網頁，也 100% 立即顯示 18 筆打卡與照片！)
@@ -936,13 +970,43 @@
 
     // 取得點位完整資訊 (根據 ID 如 "P01" 或原始字串)
     function getPointInfo(rawPt) {
-      if (!rawPt) return { id: '', label: '未指定', note: '' };
+      if (!rawPt) return { id: '', label: '未指定', note: '', reach: '' };
       const rawId = rawPt.split(' ')[0].toUpperCase();
       const config = getPointsConfig();
       const found = config.find(p => p.id.toUpperCase() === rawId);
       if (found) return found;
-      return { id: rawId, label: rawPt, note: '' };
+      return { id: rawId, label: rawPt, note: '', reach: '' };
     }
+
+    // 視角切換器 (志工打卡執勤 vs 指揮官全盤看板)
+    let currentViewMode = safeGetItem("tour_view_mode") || "volunteer";
+
+    function switchViewMode(mode) {
+      currentViewMode = mode;
+      safeSetItem("tour_view_mode", mode);
+
+      const volTab = document.getElementById("tabBtnVolunteer");
+      const cmdTab = document.getElementById("tabBtnCommander");
+      const volWrap = document.getElementById("viewVolunteerWrapper");
+      const cmdWrap = document.getElementById("viewCommanderWrapper");
+
+      if (!volTab || !cmdTab || !volWrap || !cmdWrap) return;
+
+      if (mode === "commander") {
+        cmdTab.className = "flex-1 py-2.5 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center transition active:scale-98 shadow-xs bg-[#004B97] text-white";
+        volTab.className = "flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center transition active:scale-98 text-[#0F2745] hover:bg-white/80";
+
+        volWrap.classList.add("hidden");
+        cmdWrap.classList.remove("hidden");
+      } else {
+        volTab.className = "flex-1 py-2.5 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center transition active:scale-98 shadow-xs bg-[#004B97] text-white";
+        cmdTab.className = "flex-1 py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center transition active:scale-98 text-[#0F2745] hover:bg-white/80";
+
+        volWrap.classList.remove("hidden");
+        cmdWrap.classList.add("hidden");
+      }
+    }
+
 
     // 管理員手動指派記錄 (避免被 15 秒 polling 覆蓋)
     function getAdminAssignments() {
@@ -1042,6 +1106,9 @@
           }
         });
 
+        const checkedInWithGps = assignedVolunteers.find(v => v.record && v.record.lat && v.record.lng);
+        const stationMapHref = checkedInWithGps ? `https://www.google.com/maps?q=${checkedInWithGps.record.lat},${checkedInWithGps.record.lng}` : null;
+
         const card = document.createElement("div");
         card.className = "p-3 rounded-xl border border-blue-100/90 bg-white hover:border-blue-300 transition shadow-xs space-y-2";
 
@@ -1080,6 +1147,15 @@
               ${personnelHtml}
             </div>
           </div>
+
+          ${pt.reach ? `
+            <div class="text-[11px] text-emerald-950 bg-emerald-50/90 p-2.5 rounded-lg leading-relaxed border border-emerald-200/80">
+              <div class="font-bold text-emerald-800 text-[10px] mb-0.5 flex items-center">
+                <span class="mr-1">🚶‍♂️</span> 前往與到達方式 (林道/路口指引)：
+              </div>
+              <div>${pt.reach}</div>
+            </div>
+          ` : ''}
 
           <div class="text-[11px] text-[#5b7290] bg-[#F0F8FF] p-2.5 rounded-lg leading-relaxed border border-blue-100/60">
             <div class="font-bold text-[#004B97] text-[10px] mb-0.5">📌 管制重點與注意事項：</div>
@@ -1121,13 +1197,18 @@
           <div class="flex items-center justify-between pt-0.5 text-[11px]">
             <span class="text-[10px] text-slate-400">第 ${index + 1} 號管制站</span>
             <div class="flex items-center space-x-2">
+              ${stationMapHref ? `
+                <a href="${stationMapHref}" target="_blank" class="text-blue-600 hover:text-blue-800 font-bold flex items-center text-[10px] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                  🗺️ 導航 ↗
+                </a>
+              ` : ''}
               ${isAdmin ? `
                 <button type="button" onclick="openQuickAssignModal('${pt.id}')" class="text-emerald-700 hover:text-emerald-900 font-bold flex items-center">
-                  👤 指派志工
+                  👤 指派
                 </button>
               ` : ''}
               <button type="button" onclick="openManagePointsModal('${pt.id}')" class="text-[#004B97] hover:text-[#002e5d] font-bold flex items-center">
-                ✏️ 修改名稱與註解
+                ✏️ 編輯
               </button>
             </div>
           </div>
@@ -1181,6 +1262,11 @@
           </div>
 
           <div>
+            <label class="block text-[11px] font-bold text-[#0F2745] mb-0.5">🚶‍♂️ 前往與到達方式 (林道/路口路線指引)</label>
+            <input type="text" id="pt-reach-${index}" value="${pt.reach || ''}" placeholder="如：147縣道約6K處盲彎，右側碎石叉路前行100m" class="w-full bg-[#F0F8FF] border border-blue-200 rounded-lg p-2 text-[#0F2745] text-xs focus:ring-2 focus:ring-[#004B97]">
+          </div>
+
+          <div>
             <label class="block text-[11px] font-bold text-[#0F2745] mb-0.5">現場管制註解與注意事項</label>
             <textarea id="pt-note-${index}" rows="2" placeholder="填寫該路口管制重點、提醒事項..." class="w-full bg-[#F0F8FF] border border-blue-200 rounded-lg p-2 text-slate-800 text-xs focus:ring-2 focus:ring-[#004B97]">${pt.note || ''}</textarea>
           </div>
@@ -1206,9 +1292,13 @@
       const config = getPointsConfig();
       config.forEach((pt, index) => {
         const lbl = document.getElementById(`pt-label-${index}`);
+        const rch = document.getElementById(`pt-reach-${index}`);
         const nte = document.getElementById(`pt-note-${index}`);
         if (lbl && lbl.value.trim()) {
           pt.label = lbl.value.trim();
+        }
+        if (rch) {
+          pt.reach = rch.value.trim();
         }
         if (nte) {
           pt.note = nte.value.trim();
@@ -1217,7 +1307,7 @@
 
       savePointsConfig(config);
       closeManagePointsModal();
-      alert("✅ P1 ~ P10 站點名稱與註解已成功儲存！所有選單、站點看板與名冊已即時更新。");
+      alert("✅ P1 ~ P10 站點名稱、到達方式與註解已成功儲存！所有選單、站點看板與名冊已即時更新。");
     }
 
     function resetPointsConfig() {
@@ -1236,6 +1326,7 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       checkAdminStatus();
+      switchViewMode(currentViewMode);
       renderPointDropdowns();
       renderStationsBoard();
       renderRoster();
@@ -1282,6 +1373,7 @@
         sessionStorage.setItem("is_admin", "true");
         checkAdminStatus();
         closeLoginModal();
+        switchViewMode("commander");
         alert("🛡️ 管理員已登入！您現在可以自訂點位名稱、指派人員與調整系統設定。");
         renderStationsBoard();
         renderRoster();
@@ -1394,6 +1486,11 @@
               <span class="text-[#5b7290]">指定站點：</span>
               <span class="font-bold text-[#004B97]">${ptInfo.id ? `${ptInfo.id} (${ptInfo.label})` : '尚未指定 (邊騎邊放)'}</span>
             </div>
+            ${ptInfo.reach ? `
+              <div class="pt-1.5 border-t border-blue-200/60 text-emerald-950 bg-emerald-50/80 p-2 rounded-lg border border-emerald-200/80 text-xs">
+                🚶‍♂️ <strong>前往到達方式：</strong> ${ptInfo.reach}
+              </div>
+            ` : ''}
             ${ptInfo.note ? `
               <div class="pt-1.5 border-t border-blue-200/60 text-[#0F2745] bg-amber-50/70 p-2 rounded-lg border border-amber-200/80 text-xs">
                 📌 <strong>${ptInfo.id} 站點管制註解：</strong> ${ptInfo.note}
@@ -1458,6 +1555,11 @@
             ${userRecord.note ? `
               <div class="pt-1 border-t border-blue-200/60 text-[#0F2745]">
                 💬 <strong>志工回報備註：</strong> ${userRecord.note}
+              </div>
+            ` : ''}
+            ${ptInfo.reach ? `
+              <div class="pt-1.5 border-t border-blue-200/60 text-emerald-950 bg-emerald-50/80 p-2 rounded-lg border border-emerald-200/80 text-xs">
+                🚶‍♂️ <strong>前往到達方式：</strong> ${ptInfo.reach}
               </div>
             ` : ''}
             ${ptInfo.note ? `
